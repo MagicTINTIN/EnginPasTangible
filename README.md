@@ -51,6 +51,7 @@ Essayez d'adapter les méthodes montrées ci-dessus, aucune garantie que cela fo
 ## Images issues d'EnginPasTangible
 
 * ### V0.2.2
+
 <figure>
     <img src="/screenshots/v0.2.2.png"
          alt="Capture d'écran de la toute première version">
