@@ -5,7 +5,7 @@ Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 > développé par *Victor LASSERRE* et *Valentin SERVIERES*
 
 <figure>
-    <img src="./assets/enginpastangible.png"
+    <img src="/assets/enginpastangible.png"
         width="50%"
         alt="Logo d'EnginPasTangible">
 </figure>
@@ -52,7 +52,7 @@ Essayez d'adapter les méthodes montrées ci-dessus, aucune garantie que cela fo
 
 * ### V0.2.2
 <figure>
-    <img src="./screenshots/v0.2.2.png"
+    <img src="/screenshots/v0.2.2.png"
          alt="Capture d'écran de la toute première version">
     <figcaption>Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)</figcaption>
 </figure>
