@@ -7,7 +7,7 @@ Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 ![Logo d'EnginPasTangible](./assets/icon.png)
 
 ---
-Le projet est en cours de création, il peut y avoir des bugs.
+⚠️ Le projet est en cours de création, il peut y avoir des bugs. ⚠️
 
 ---
 
@@ -49,5 +49,5 @@ Essayez d'adapter les méthodes montrées ci-dessus, aucune garantie que cela fo
 
 ### V0.2.2
 
-![Capture d'écran de la toute première version](./screenshots/v0.2.2.png)
+![Capture d'écran de la toute première version](./screenshots/v0.2.2.png)<br>
 Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)
