@@ -4,10 +4,7 @@
 Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 > développé par *Victor LASSERRE* et *Valentin SERVIERES*
 
-<figure>
-    <img src="./assets/enginpastangible.png"
-        alt="Logo d'EnginPasTangible">
-</figure>
+![Logo d'EnginPasTangible](./assets/icon.png)
 
 ---
 Le projet est en cours de création, il peut y avoir des bugs.
@@ -20,7 +17,6 @@ Le projet est en cours de création, il peut y avoir des bugs.
 Pour pouvoir utiliser le moteur il vous suffit d'installer les librairies glfw.
 > ### Linux
 
-<br>
 * Pour les distributions Debian :
   
   `sudo apt install libglfw3-dev`
@@ -53,8 +49,5 @@ Essayez d'adapter les méthodes montrées ci-dessus, aucune garantie que cela fo
 
 ### V0.2.2
 
-<figure>
-    <img src="./screenshots/v0.2.2.png"
-         alt="Capture d'écran de la toute première version">
-    <figcaption>Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)</figcaption>
-</figure>
+![Capture d'écran de la toute première version](./screenshots/v0.2.2.png)
+Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)
