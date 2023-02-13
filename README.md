@@ -6,7 +6,6 @@ Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 
 <figure>
     <img src="assets/enginpastangible.png"
-        width="50%"
         alt="Logo d'EnginPasTangible">
 </figure>
 
