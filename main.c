@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.2.4)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.2.5)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -29,10 +29,13 @@ void setupVAO();
 unsigned int VAO;
 
 float currentTime, deltaTime, lastFrame,startTime;
+float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+  if (!action == GLFW_PRESS)
+    return;
+  if (key == GLFW_KEY_ESCAPE)
   {
     //glfwSetWindowShouldClose(window, GLFW_TRUE);
     pause=!pause;
@@ -48,13 +51,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
   }
-  /*if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-    glfwSetCursorPos(window, 640/2, 480/2);*/
+  if (key == GLFW_KEY_BACKSPACE)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+  mousePosX = xpos;
+  mousePosY = ypos;
   if (DEBUG_MODE % 3 == 0)
     printf("x:%f | y:%f\n",xpos, ypos);
 }
@@ -119,7 +124,6 @@ int main (){
   stbi_image_free(images[0].pixels);
 
   int window_width, window_height;
-  float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
 	char FPS[20];
 	startTime = glfwGetTime();
   while (!glfwWindowShouldClose(window))
