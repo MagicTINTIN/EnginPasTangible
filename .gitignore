@@ -13,7 +13,6 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.dylib
 *.dll
 
 # Fortran module files
@@ -23,7 +22,6 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
 *.lib
 
 # Executables
@@ -52,13 +50,11 @@
 
 # Libraries
 *.lib
-*.a
 *.la
 *.lo
 
 # Shared objects (inc. Windows DLLs)
 *.dll
-*.dylib
 
 # Executables
 *.exe
