@@ -50,7 +50,8 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	if(impact.w<0.) return vec3(.5,.7,1.);
 	vec3 normale=grad(impact.xyz);
-	return normale;
+	vec3 sunPos=vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));//vec3(1.,1.5,.5);
+	return vec3(clamp(0.,1.,dot(sunPos-impact.xyz,normale)));//normale;
 }
 
 float Mandel(vec2 co){
@@ -58,7 +59,7 @@ float Mandel(vec2 co){
 	float limf=100.0;
 	float cf=0.0;
 	int c;
-	for(c=0;c<100;c++){
+	for(c=0;c<30;c++){
 		coo=vec2(pow(coo.x,2.0)-pow(coo.y,2.0)+co.x,2.*coo.x*coo.y+co.y);
 		if(length(coo)>=2.0){
 			return cf/limf;
@@ -70,8 +71,8 @@ float Mandel(vec2 co){
 
 void main()
 {
-	vec3 lookingAt = vec3(0.,0.,0.);
-	vec3 posCam    = vec3(3.*sin(Time*.5),0.,3.*cos(Time*.5));
+	vec3 lookingAt = vec3(0.);
+	vec3 posCam    = vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
 	
 	vec3 ez = normalize(lookingAt-posCam);////base orthonormée
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
