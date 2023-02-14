@@ -72,7 +72,8 @@ float Mandel(vec2 co){
 void main()
 {
 	vec3 lookingAt = vec3(0.);
-	vec3 posCam    = vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
+	//vec3 posCam    = vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
+	vec3 posCam    = vec3(-3.*sin(MousePos.x/400)*(1-abs(atan(MousePos.y/500))),2*atan(MousePos.y/300),3.*cos(MousePos.x/400)*(1-abs(atan(MousePos.y/500))));
 	
 	vec3 ez = normalize(lookingAt-posCam);////base orthonormée
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
