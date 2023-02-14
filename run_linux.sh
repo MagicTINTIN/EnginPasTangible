@@ -1,6 +1,6 @@
 
 # takes an argument for compilation
-##LD_LIBRARY_PATH=$(pwd) ./a.out
+#LD_LIBRARY_PATH=$(pwd) ./a.out
 # Exits and displays error if there is no argument provided
 if [ $# -eq 0 ]; then
     echo "This script requires an argument."
