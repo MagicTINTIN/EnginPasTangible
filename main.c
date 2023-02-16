@@ -1,22 +1,68 @@
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.2.5)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
-
+#include <stdbool.h>
 #include "./Libraries/GLFW/glfw3.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
 #define FULLSCREEN 0
+/* ## DEBUG MODE ##
+ * 0 for all
+ * 1 for nothing
+ * 2 for FPS
+ * 3 for cursor position
+ * 
+ * For instance if you want fps and position set the value to 2*3=6
+ */
+#define DEBUG_MODE 1
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
 GLFWwindow* window;
+
+bool pause;
 
 void setupVAO();
 //GLuint getTextureHandle(char* path);
 unsigned int VAO;
 
 float currentTime, deltaTime, lastFrame,startTime;
+float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
+
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+  if (!action == GLFW_PRESS)
+    return;
+  if (key == GLFW_KEY_ESCAPE)
+  {
+    //glfwSetWindowShouldClose(window, GLFW_TRUE);
+    pause=!pause;
+    printf(pause ? "En pause\n" : "En fonctionnement\n");
+    if (pause)
+    {
+      glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+    else
+    {
+      glfwSetWindowTitle(window, APPNAMEVERSION);
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+  }
+  if (key == GLFW_KEY_BACKSPACE)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+  mousePosX = xpos;
+  mousePosY = ypos;
+  if (DEBUG_MODE % 3 == 0)
+    printf("x:%f | y:%f\n",xpos, ypos);
+}
 
 int main (){
 
@@ -31,8 +77,8 @@ int main (){
   glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);//#####
 	//glfwWindowHint(GLFW_DECORATED,GL_FALSE);
 	//glfwWindowHint(GLFW_CONTEXT_NO_ERROR,GL_FALSE);
-
-  window = glfwCreateWindow(screenWidth, screenHeight, "EnginPasTangible (alpha 0.2.2)", NULL, NULL);
+  pause = false;
+  window = glfwCreateWindow(screenWidth, screenHeight, APPNAMEVERSION, NULL, NULL);
     
   if (window == NULL)
   {
@@ -68,11 +114,9 @@ int main (){
   // for alpha (opacity)
   //glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  // GLFWimage images[2];
-  // images[0] = load_icon("assets/enginpastangible.png");
-  // images[1] = load_icon("assets/icon.png");
-  
-  // glfwSetWindowIcon(window, 2, images);
+  glfwSetKeyCallback(window, key_callback);
+ 	glfwSetCursorPosCallback(window, cursor_position_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   GLFWimage images[1]; 
   images[0].pixels = stbi_load("./assets/icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
@@ -80,17 +124,27 @@ int main (){
   stbi_image_free(images[0].pixels);
 
   int window_width, window_height;
-  float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
 	char FPS[20];
 	startTime = glfwGetTime();
   while (!glfwWindowShouldClose(window))
   {
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+    // -------------------------------------------------------------------------------
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 
+    if (pause)
+    {
+      glClearColor(.1f, .2f, 0.3f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT);
+      continue;
+    }
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
     gcvt(1/deltaTime,4,FPS);
-    printf("FPS : %s\n",FPS);
+    if (DEBUG_MODE % 2 == 0)
+      printf("FPS : %s\n",FPS);
 
     glfwGetWindowSize(window, &window_width, &window_height);
     glViewport(0, 0, window_width, window_height);
@@ -107,12 +161,6 @@ int main (){
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamDir"), camDirX,camDirY,camDirZ);
 				
     // glBindVertexArray(0); // no need to unbind it every time 
-
-    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-    // -------------------------------------------------------------------------------
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-
   }
 
   // Optional cleaning up bc OS will likely do it for us, but is a good practice. Note that shaders are deleted in shader.h

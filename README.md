@@ -51,3 +51,8 @@ Essayez d'adapter les méthodes montrées ci-dessus, aucune garantie que cela fo
 
 ![Capture d'écran de la toute première version](./screenshots/v0.2.2.png)<br>
 Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)
+
+### V0.2.5
+
+![Capture d'écran de la toute première version](./screenshots/EnginPasTangiblev0.2.5.gif)<br>
+Rotation autour du centre contrôlée par la souris (v0.2.5)
