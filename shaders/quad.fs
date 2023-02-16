@@ -9,6 +9,18 @@ in vec3 CamDir;
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
 
+vec3 rotate(vec3 pos, vec3 angles){
+	float ca=cos(angles.x);
+	float sa=sin(angles.x);
+	float cb=cos(angles.y);
+	float sb=sin(angles.y);
+	float cc=cos(angles.z);
+	float sc=sin(angles.z);
+	return vec3(cb*cc*pos.x+(sa*sb*cc-ca*sc)*pos.y+(ca*sb*cc+sa*sc)*pos.z,
+							cb*sc*pos.x+(sa*sb*sc+ca*cc)*pos.y+(ca*sb*sc-sa*cc)*pos.z,
+							-sb*pos.x+sa*cb*pos.y+ca*cb*pos.z);
+}
+
 float SDF_Box_Frame( vec3 p, vec3 b, float e )
 {
        p = abs(p  )-b;
@@ -24,7 +36,7 @@ float SDF_Circle(vec3 p,float r){
 }
 
 float SDF_Global(vec3 p){
-	return min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
+	return SDF_Box_Frame(rotate(p,vec3(1.*Time,2.*Time,3.*Time)),vec3(1.5,1.5,1.5),.5);//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
@@ -50,7 +62,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	if(impact.w<0.) return vec3(.5,.7,1.);
 	vec3 normale=grad(impact.xyz);
-	vec3 sunPos=vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));//vec3(1.,1.5,.5);
+	vec3 sunPos=vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
 	return vec3(clamp(0.,1.,dot(sunPos-impact.xyz,normale)));//normale;
 }
 
@@ -69,10 +81,9 @@ float Mandel(vec2 co){
 	return 0.0;
 }
 
-void main()
-{
+void main(){
 	vec3 lookingAt = vec3(0.);
-	vec3 posCam    = vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
+	vec3 posCam    = vec3(2.5,2.5,2.5);//vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
 	
 	vec3 ez = normalize(lookingAt-posCam);////base orthonormée
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
