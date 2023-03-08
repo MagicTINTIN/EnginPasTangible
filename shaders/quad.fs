@@ -21,6 +21,10 @@ vec3 rotate(vec3 pos, vec3 angles){
 							-sb*pos.x+sa*cb*pos.y+ca*cb*pos.z);
 }
 
+vec3 infinity(vec3 pos,vec3 box){
+	return mod(pos+.5*box,box)-.5*box;
+}
+
 float SDF_Box_Frame( vec3 p, vec3 b, float e )
 {
        p = abs(p  )-b;
@@ -36,7 +40,7 @@ float SDF_Circle(vec3 p,float r){
 }
 
 float SDF_Global(vec3 p){
-	return SDF_Box_Frame(rotate(p,vec3(1.*Time,2.*Time,3.*Time)),vec3(1.5,1.5,1.5),.5);//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
+	return SDF_Box_Frame(rotate(infinity(p,vec3(2.,2.,2.)),vec3(.2*Time,.4*Time,.6*Time)),vec3(.5,.5,.5),.1);//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
