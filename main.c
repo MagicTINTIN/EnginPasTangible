@@ -16,7 +16,7 @@
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 1
+#define DEBUG_MODE 3
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -60,6 +60,20 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 {
   mousePosX = xpos;
   mousePosY = ypos;
+  /*
+  //if (xpos>283){ //////283=3.14/2 * 180
+  //	//xpos=283
+  //}
+  //if (xpos<-283){
+  //	//xpos=-283
+  //}
+  if (ypos>283){
+  	//ypos=283
+  }
+  if (ypos<283){
+  	//ypos=-283
+  }
+  */
   if (DEBUG_MODE % 3 == 0)
     printf("x:%f | y:%f\n",xpos, ypos);
 }
