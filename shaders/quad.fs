@@ -40,7 +40,7 @@ float SDF_Circle(vec3 p,float r){
 }
 
 float SDF_Global(vec3 p){
-	return SDF_Box_Frame(rotate(infinity(p,vec3(2.,2.,2.)),vec3(.2*Time,.4*Time,.6*Time)),vec3(.5,.5,.5),.1);//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
+	return SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(.5,.5,.5),.1);//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
@@ -64,7 +64,7 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return vec3(.5,.7,1.);
+	if(impact.w<0.) return (impact.y+1.)*.05*vec3(.5,.7,1.);
 	vec3 normale=grad(impact.xyz);
 	vec3 sunPos=vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
 	return vec3(clamp(0.,1.,dot(sunPos-impact.xyz,normale)));//normale;
@@ -87,10 +87,17 @@ float Mandel(vec2 co){
 
 void main(){
 	vec3 lookingAt = vec3(0.);
-	vec3 posCam    = vec3(2.5,2.5,2.5);//vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
-	vec3 posCam    = vec3(-3.*sin(MousePos.x/400)*(1-abs(atan(MousePos.y/500))),2*atan(MousePos.y/300),3.*cos(MousePos.x/400)*(1-abs(atan(MousePos.y/500))));
-	
-	vec3 ez = normalize(lookingAt-posCam);////base orthonormée
+	vec3 posCam    = vec3(2.5,0.5,2.5);//vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
+	//vec3 posCam    = vec3(-3.*sin(MousePos.x/400)*(1-abs(atan(MousePos.y/500))),2*atan(MousePos.y/300),3.*cos(MousePos.x/400)*(1-abs(atan(MousePos.y/500))));
+	float pan=MousePos.x/180.;
+	float tilt=MousePos.y/180.;
+	//tilt=max(min(tilt,3.14*.45),-3.14*.45);
+	int parity = int(tilt/3.14-.5);
+	if(parity%2==1){
+		pan+=3.14;
+	}
+
+	vec3 ez = vec3(cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan));//normalize(lookingAt-posCam);////base orthonormée
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
 	vec3 ey = cross(ex,ez);
 	
