@@ -92,16 +92,12 @@ void main(){
 	float pan=MousePos.x/180.;
 	float tilt=MousePos.y/180.;
 	//tilt=max(min(tilt,3.14*.45),-3.14*.45);
-	int parity = int(tilt/3.14-.5);
-	if(parity%2==1){
-		pan+=3.14;
-	}
 
 	vec3 ez = vec3(cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan));//normalize(lookingAt-posCam);////base orthonormée
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
 	vec3 ey = cross(ex,ez);
 	
-	vec3 dir = normalize(FragCoord.x * ex + FragCoord.y*ey + 1.*ez);
+	vec3 dir = normalize(FragCoord.x * ex + FragCoord.y*ey + 1.5*ez);
 	
 	
   //float c=Mandel(FragCoord*1.5);
