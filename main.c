@@ -30,6 +30,10 @@ unsigned int VAO;
 
 float currentTime, deltaTime, lastFrame,startTime;
 float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
+//283=3.14/2 * 180
+const int maxYmouse = 283;
+// more precision means less speed
+const int camPrecision = 2;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -58,24 +62,25 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-  mousePosX = xpos;
-  mousePosY = ypos;
   /*
   //if (xpos>283){ //////283=3.14/2 * 180
   //	//xpos=283
   //}
   //if (xpos<-283){
   //	//xpos=-283
-  //}
-  if (ypos>283){
-  	//ypos=283
+  //}*/
+  int maxYcorrected = maxYmouse*camPrecision;
+  if (ypos>maxYcorrected){
+    glfwSetCursorPos(window, xpos, maxYcorrected);
   }
-  if (ypos<283){
-  	//ypos=-283
+  if (ypos<-maxYcorrected){
+  	glfwSetCursorPos(window, xpos, -maxYcorrected);
   }
-  */
+  
   if (DEBUG_MODE % 3 == 0)
     printf("x:%f | y:%f\n",xpos, ypos);
+  mousePosX = xpos/camPrecision;
+  mousePosY = ypos/camPrecision;
 }
 
 int main (){
