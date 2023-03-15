@@ -4,7 +4,7 @@ in vec2 FragCoord;
 in float Time;
 in vec2 MousePos;
 in vec3 CamPos;
-in vec3 CamDir;
+in float fovValue;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
@@ -101,7 +101,7 @@ void main(){
 	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
 	vec3 ey = cross(ex,ez);
 	
-	vec3 dir = normalize(FragCoord.x * ex + FragCoord.y*ey + 1.*ez);
+	vec3 dir = normalize(FragCoord.x * ex + FragCoord.y*ey + fovValue*ez);
 	
 	
   //float c=Mandel(FragCoord*1.5);

@@ -7,12 +7,12 @@ out vec2 FragCoord;
 out float Time;
 out vec2 MousePos;
 out vec3 CamPos;
-out vec3 CamDir;
+out float fovValue;
 
 uniform float iTime;
 uniform vec2 iMousePos;
 uniform vec3 iCamPos;
-uniform vec3 iCamDir;
+uniform float iFovValue;
 
 
 void main()
@@ -22,5 +22,5 @@ void main()
    Time=iTime;
    MousePos = iMousePos;
    CamPos = iCamPos;
-   CamDir = iCamDir;
+   fovValue = iFovValue;
 }
