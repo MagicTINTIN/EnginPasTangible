@@ -8,15 +8,17 @@
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
 #define FULLSCREEN 0
+#define EXPERIMENTAL_FEATURES 1
 /* ## DEBUG MODE ##
  * 0 for all
  * 1 for nothing
  * 2 for FPS
  * 3 for cursor position
+ * 5 for scroll level and precision
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 3
+#define DEBUG_MODE 5
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -29,11 +31,12 @@ void setupVAO();
 unsigned int VAO;
 
 float currentTime, deltaTime, lastFrame,startTime;
-float mousePosX,mousePosY,camPosX,camPosY,camPosZ,camDirX,camDirY,camDirZ;
+float mousePosX,mousePosY,camPosX,camPosY,camPosZ;
+float fovValue=1.0;
 //283=3.14/2 * 180
 const int maxYmouse = 283;
 // more precision means less speed
-const int camPrecision = 2;
+float camPrecision = 2.;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -59,6 +62,27 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  int stateControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
+  
+  // we only use yoffset as it is present on normal mice
+  if (DEBUG_MODE % 5 == 0)
+    printf("scroll value : %f | precision : %f | ",yoffset, camPrecision);
+    printf((stateControl == GLFW_PRESS) ? "ctrl -> speed" : "Zooming");
+    printf("\n");
+  if (stateControl == GLFW_PRESS) {
+    camPrecision += yoffset/2;
+    if (camPrecision <= 1)
+      camPrecision=1;
+  }
+  else {
+    fovValue += yoffset/5;
+    if (fovValue <= 0.2 && EXPERIMENTAL_FEATURES == 0)
+      fovValue=0.2;
+  }
+  
+}
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -136,6 +160,7 @@ int main (){
   glfwSetKeyCallback(window, key_callback);
  	glfwSetCursorPosCallback(window, cursor_position_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetScrollCallback(window, scroll_callback);
 
   GLFWimage images[1]; 
   images[0].pixels = stbi_load("./assets/icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
@@ -177,8 +202,7 @@ int main (){
     glUniform1f(glGetUniformLocation(quad_shader, "iTime"), currentTime-startTime);
 		glUniform2f(glGetUniformLocation(quad_shader, "iMousePos"), mousePosX,mousePosY);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform3f(glGetUniformLocation(quad_shader, "iCamDir"), camDirX,camDirY,camDirZ);
-				
+		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 
