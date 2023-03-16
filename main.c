@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.2.5)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.3.1)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -31,7 +31,19 @@ void setupVAO();
 unsigned int VAO;
 
 float currentTime, deltaTime, lastFrame,startTime;
-float mousePosX,mousePosY,camPosX,camPosY,camPosZ;
+float mousePosX,mousePosY;
+
+float camPosX=2.5;
+float camPosY=0.5;
+float camPosZ=2.5;
+float speed=.02;
+float pan=0.;
+float multiplicatorFov=1.;
+float tilt=0.;
+float ez[3] = {0};
+float ex[3] = {0};
+float ey[3] = {0};
+
 float fovValue=1.0;
 //283=3.14/2 * 180
 const int maxYmouse = 283;
@@ -50,6 +62,17 @@ float camPrecision = 2.;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+  int stateShift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+  int stateControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
+  if (stateShift == GLFW_PRESS) {
+    speed=.08;
+    multiplicatorFov=0.8;
+  }
+  else {
+    speed=.02;
+    multiplicatorFov=1.;
+  }
+  
   if (!action == GLFW_PRESS)
     return;
   if (key == GLFW_KEY_ESCAPE)
@@ -70,6 +93,30 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
   }
   if (key == GLFW_KEY_BACKSPACE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
+  if (key == GLFW_KEY_SPACE && stateControl != GLFW_PRESS)
+    camPosY += speed;
+  if (key == GLFW_KEY_SPACE && stateControl == GLFW_PRESS)
+    camPosY -= speed;
+  if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+    camPosX += speed*ez[0];
+    camPosY += speed*ez[1];
+    camPosZ += speed*ez[2];
+  }
+  if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
+    camPosX -= speed*ez[0];
+    camPosY -= speed*ez[1];
+    camPosZ -= speed*ez[2];
+  }
+  if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+    camPosX += speed*ex[0];
+    camPosY += speed*ex[1];
+    camPosZ += speed*ex[2];
+  }
+  if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
+    camPosX -= speed*ex[0];
+    camPosY -= speed*ex[1];
+    camPosZ -= speed*ex[2];
+  }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -194,15 +241,20 @@ int main (){
       continue;
     }
 
-    float pan=-mousePosX/180.;
-	  float tilt=-mousePosY/180.;
-    float ez[3] = {cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan)};//normalize(lookingAt-posCam);////base orthonormée
-	  float ex[3] = {-ez[2],0,ez[0]};//crossProduct(ez,{0.,1.,0.});
-	  float ey[3] = {
-      ex[1] * ez[2] - ex[2] * ez[1],
-      ex[2] * ez[0] - ex[0] * ez[2],
-      ex[0] * ez[1] - ex[1] * ez[0]
-    };//crossProduct(ex,ez);
+    pan=-mousePosX/180.;
+	  tilt=-mousePosY/180.;
+    //ez
+    ez[0] = cos(tilt)*sin(pan);
+    ez[1] = sin(tilt);
+    ez[2] = cos(tilt)*cos(pan);//normalize(lookingAt-posCam);////base orthonormée
+	  //ex
+    ex[0] = -ez[2];//crossProduct(ez,{0.,1.,0.});
+    ex[2] = ez[0];
+	  // ey
+    ey[0] = ex[1] * ez[2] - ex[2] * ez[1];
+    ey[1] = ex[2] * ez[0] - ex[0] * ez[2];
+    ey[2] = ex[0] * ez[1] - ex[1] * ez[0];
+    //crossProduct(ex,ez);
 
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
@@ -225,7 +277,7 @@ int main (){
     glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue);
+		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*multiplicatorFov);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 
@@ -287,40 +339,5 @@ void setupVAO(){
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
 }
-/*
-GLuint getTextureHandle(char* path)
-{
-    GLuint textureHandle;
-    glGenTextures(1, &textureHandle);
-    glBindTexture(GL_TEXTURE_2D, textureHandle); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
-    
-    // Set our texture parameters
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // Set texture wrapping to GL_REPEAT
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);   // Set texture wrapping to GL_CLAMP_TO_BORDER
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    
-    // Set texture filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Load, create texture and generate mipmaps; 
-    //
-    // Note: image loaders usually think of top left as being (0,0) while in OpenGL I would rather think of bottom left as being (0,0) as OpenGL does that already, so that is why I set the stb library to flip image vertically. There are other workarounds like flipping our texCoords upside down or flipping things in the vs or fs, but that would mean that we are choosing in OpenGL to work with two different coordinate systems, one upside-down from the other. I would rather choose not to do that and simply flip images when loading in. It is a matter of personal choice.
-    // 
-
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(1);
-    unsigned char *image = stbi_load(path, &width, &height, &nrChannels, 0);
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-   
-    // free memory 
-    stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0); // unbind so that we can deal with other textures
-
-    return textureHandle;
-}
-*/
 
