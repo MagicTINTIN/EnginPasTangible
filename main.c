@@ -38,6 +38,16 @@ const int maxYmouse = 283;
 // more precision means less speed
 float camPrecision = 2.;
 
+/*float[3] crossProduct(float vect_A[3], float vect_B[3])
+ 
+{
+  float cross_P[3];
+  cross_P[0] = vect_A[1] * vect_B[2] - vect_A[2] * vect_B[1];
+  cross_P[1] = vect_A[2] * vect_B[0] - vect_A[0] * vect_B[2];
+  cross_P[2] = vect_A[0] * vect_B[1] - vect_A[1] * vect_B[0];
+  return cross_P;
+}*/
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   if (!action == GLFW_PRESS)
@@ -183,6 +193,17 @@ int main (){
       glClear(GL_COLOR_BUFFER_BIT);
       continue;
     }
+
+    float pan=-mousePosX/180.;
+	  float tilt=-mousePosY/180.;
+    float ez[3] = {cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan)};//normalize(lookingAt-posCam);////base orthonormée
+	  float ex[3] = {-ez[2],0,ez[0]};//crossProduct(ez,{0.,1.,0.});
+	  float ey[3] = {
+      ex[1] * ez[2] - ex[2] * ez[1],
+      ex[2] * ez[0] - ex[0] * ez[2],
+      ex[0] * ez[1] - ex[1] * ez[0]
+    };//crossProduct(ex,ez);
+
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
@@ -200,7 +221,9 @@ int main (){
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glUniform1f(glGetUniformLocation(quad_shader, "iTime"), currentTime-startTime);
-		glUniform2f(glGetUniformLocation(quad_shader, "iMousePos"), mousePosX,mousePosY);
+		glUniform3f(glGetUniformLocation(quad_shader, "iEx"), ex[0],ex[1],ex[2]);
+    glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
+    glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
 		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue);
     // glBindVertexArray(0); // no need to unbind it every time 
