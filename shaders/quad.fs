@@ -2,7 +2,9 @@
 
 in vec2 FragCoord;
 in float Time;
-in vec2 MousePos;
+in vec3 Ex;
+in vec3 Ey;
+in vec3 Ez;
 in vec3 CamPos;
 in float fovValue;
 
@@ -89,15 +91,15 @@ void main(){
 	vec3 lookingAt = vec3(0.);
 	vec3 posCam    = vec3(2.5,0.5,2.5);//vec3(-3.*sin(Time*.15),.6*cos(Time*.15),3.*cos(Time*.15));
 	//vec3 posCam    = vec3(-3.*sin(MousePos.x/400)*(1-abs(atan(MousePos.y/500))),2*atan(MousePos.y/300),3.*cos(MousePos.x/400)*(1-abs(atan(MousePos.y/500))));
-	float pan=-MousePos.x/180.;
-	float tilt=-MousePos.y/180.;
+	//float pan=-MousePos.x/180.;
+	//float tilt=-MousePos.y/180.;
 	//tilt=max(min(tilt,3.14*.45),-3.14*.45);
 
-	vec3 ez = vec3(cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan));//normalize(lookingAt-posCam);////base orthonormée
-	vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
-	vec3 ey = cross(ex,ez);
+	//vec3 ez = vec3(cos(tilt)*sin(pan),sin(tilt),cos(tilt)*cos(pan));//normalize(lookingAt-posCam);////base orthonormée
+	//vec3 ex = normalize(cross(ez,vec3(0.,1.,0.)));
+	//vec3 ey = cross(ex,ez);
 	
-	vec3 dir = normalize(FragCoord.x * ex + FragCoord.y*ey + fovValue*ez);
+	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
 	
   //float c=Mandel(FragCoord*1.5);
