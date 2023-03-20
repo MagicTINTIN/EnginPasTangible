@@ -7,6 +7,7 @@ in vec3 Ey;
 in vec3 Ez;
 in vec3 CamPos;
 in float fovValue;
+in float FacteurLargeur;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
