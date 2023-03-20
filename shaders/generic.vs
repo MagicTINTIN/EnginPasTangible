@@ -8,11 +8,13 @@ out float Time;
 out vec2 MousePos;
 out vec3 CamPos;
 out vec3 CamDir;
+out float FacteurLargeur;
 
 uniform float iTime;
 uniform vec2 iMousePos;
 uniform vec3 iCamPos;
 uniform vec3 iCamDir;
+uniform float iFacteurLargeur;
 
 
 void main()
@@ -23,4 +25,5 @@ void main()
    MousePos = iMousePos;
    CamPos = iCamPos;
    CamDir = iCamDir;
+   FacteurLargeur=iFacteurLargeur;
 }
