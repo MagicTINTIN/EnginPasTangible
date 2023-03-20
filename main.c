@@ -18,7 +18,7 @@
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 5
+#define DEBUG_MODE 1
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -43,6 +43,13 @@ float tilt=0.;
 float ez[3] = {0};
 float ex[3] = {0};
 float ey[3] = {0};
+
+bool upar = false;
+bool downar = false;
+bool leftar = false;
+bool rightar = false;
+bool forwardar = false;
+bool backwardar = false;
 
 float fovValue=1.0;
 //283=3.14/2 * 180
@@ -73,49 +80,59 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     multiplicatorFov=1.;
   }
   
-  if (!action == GLFW_PRESS)
-    return;
-  if (key == GLFW_KEY_ESCAPE)
-  {
-    //glfwSetWindowShouldClose(window, GLFW_TRUE);
-    pause=!pause;
-    printf(pause ? "En pause\n" : "En fonctionnement\n");
-    if (pause)
+  if (action == GLFW_PRESS) {
+    if (key == GLFW_KEY_ESCAPE)
     {
-      glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      //glfwSetWindowShouldClose(window, GLFW_TRUE);
+      pause=!pause;
+      printf(pause ? "En pause\n" : "En fonctionnement\n");
+      if (pause)
+      {
+        glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      }
+      else
+      {
+        glfwSetWindowTitle(window, APPNAMEVERSION);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
     }
-    else
-    {
-      glfwSetWindowTitle(window, APPNAMEVERSION);
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (key == GLFW_KEY_BACKSPACE)
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (key == GLFW_KEY_SPACE)
+      upar = true;
+    if (key == GLFW_KEY_LEFT_CONTROL)
+      downar = true;
+    if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+      forwardar = true;
+    }
+    if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
+      backwardar = true;
+    }
+    if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+      rightar = true;
+    }
+    if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
+      leftar = true;
     }
   }
-  if (key == GLFW_KEY_BACKSPACE)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
-  if (key == GLFW_KEY_SPACE && stateControl != GLFW_PRESS)
-    camPosY += speed;
-  if (key == GLFW_KEY_SPACE && stateControl == GLFW_PRESS)
-    camPosY -= speed;
-  if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-    camPosX += speed*ez[0];
-    camPosY += speed*ez[1];
-    camPosZ += speed*ez[2];
-  }
-  if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
-    camPosX -= speed*ez[0];
-    camPosY -= speed*ez[1];
-    camPosZ -= speed*ez[2];
-  }
-  if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-    camPosX += speed*ex[0];
-    camPosY += speed*ex[1];
-    camPosZ += speed*ex[2];
-  }
-  if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
-    camPosX -= speed*ex[0];
-    camPosY -= speed*ex[1];
-    camPosZ -= speed*ex[2];
+  else if (action == GLFW_RELEASE) {
+    if (key == GLFW_KEY_SPACE)
+      upar = false;
+    if (key == GLFW_KEY_LEFT_CONTROL)
+      downar = false;
+    if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+      forwardar = false;
+    }
+    if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
+      backwardar = false;
+    }
+    if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+      rightar = false;
+    }
+    if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
+      leftar = false;
+    }
   }
 }
 
@@ -255,6 +272,31 @@ int main (){
     ey[1] = ex[2] * ez[0] - ex[0] * ez[2];
     ey[2] = ex[0] * ez[1] - ex[1] * ez[0];
     //crossProduct(ex,ez);
+
+  if (upar)
+    camPosY += speed;
+  if (downar)
+    camPosY -= speed;
+  if (forwardar) {
+    camPosX += speed*ez[0];
+    camPosY += speed*ez[1];
+    camPosZ += speed*ez[2];
+  }
+  if (backwardar) {
+    camPosX -= speed*ez[0];
+    camPosY -= speed*ez[1];
+    camPosZ -= speed*ez[2];
+  }
+  if (rightar) {
+    camPosX += speed*ex[0];
+    camPosY += speed*ex[1];
+    camPosZ += speed*ex[2];
+  }
+  if (leftar) {
+    camPosX -= speed*ex[0];
+    camPosY -= speed*ex[1];
+    camPosZ -= speed*ex[2];
+  }
 
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
