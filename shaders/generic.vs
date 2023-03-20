@@ -5,15 +5,19 @@ layout (location = 2) in vec2 texCoord;
 
 out vec2 FragCoord;
 out float Time;
-out vec2 MousePos;
+out vec3 Ex;
+out vec3 Ey;
+out vec3 Ez;
 out vec3 CamPos;
-out vec3 CamDir;
+out float fovValue;
 out float FacteurLargeur;
 
 uniform float iTime;
-uniform vec2 iMousePos;
+uniform vec3 iEx;
+uniform vec3 iEy;
+uniform vec3 iEz;
 uniform vec3 iCamPos;
-uniform vec3 iCamDir;
+uniform float iFovValue;
 uniform float iFacteurLargeur;
 
 
@@ -22,8 +26,10 @@ void main()
    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
    FragCoord = texCoord;
    Time=iTime;
-   MousePos = iMousePos;
+   Ex = iEx;
+   Ey = iEy;
+   Ez = iEz;
    CamPos = iCamPos;
-   CamDir = iCamDir;
+   fovValue = iFovValue;
    FacteurLargeur=iFacteurLargeur;
 }
