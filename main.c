@@ -18,7 +18,7 @@
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 5
+#define DEBUG_MODE 1
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -45,8 +45,8 @@ float ex[3] = {0};
 float ey[3] = {0};
 
 float fovValue=1.0;
-//283=3.14/2 * 180
-const int maxYmouse = 283;
+//281=3.13/2 * 180
+const int maxYmouse = 281;
 // more precision means less speed
 float camPrecision = 2.;
 
