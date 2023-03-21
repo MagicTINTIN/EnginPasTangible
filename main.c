@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.3.1)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.4.2)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -7,8 +7,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
-
+/* SCENE LIST 
+shaders/default.fs
+shaders/immeublesparisiens.fs
+*/
 #define SCENE "shaders/default.fs"
+//#define SCENE "shaders/immeublesparisiens.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -20,7 +24,7 @@
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 1
+#define DEBUG_MODE 2
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -35,10 +39,11 @@ unsigned int VAO;
 float currentTime, deltaTime, lastFrame,startTime;
 float mousePosX,mousePosY;
 
+float speedlevel=4.;
 float camPosX=2.5;
 float camPosY=0.5;
 float camPosZ=2.5;
-float speed=.02;
+float speed=.04;
 float pan=0.;
 float multiplicatorFov=1.;
 float tilt=0.;
@@ -74,11 +79,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
   int stateShift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
   int stateControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
   if (stateShift == GLFW_PRESS) {
-    speed=.08;
+    speed=.08*speedlevel;
     multiplicatorFov=0.8;
   }
   else {
-    speed=.02;
+    speed=.02*speedlevel;
     multiplicatorFov=1.;
   }
   
