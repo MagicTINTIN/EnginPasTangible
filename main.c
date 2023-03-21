@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
+
+#define SCENE "shaders/default.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -44,6 +46,13 @@ float ez[3] = {0};
 float ex[3] = {0};
 float ey[3] = {0};
 
+bool upar = false;
+bool downar = false;
+bool leftar = false;
+bool rightar = false;
+bool forwardar = false;
+bool backwardar = false;
+
 float fovValue=1.0;
 //281=3.13/2 * 180
 const int maxYmouse = 281;
@@ -73,49 +82,59 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     multiplicatorFov=1.;
   }
   
-  if (!action == GLFW_PRESS)
-    return;
-  if (key == GLFW_KEY_ESCAPE)
-  {
-    //glfwSetWindowShouldClose(window, GLFW_TRUE);
-    pause=!pause;
-    printf(pause ? "En pause\n" : "En fonctionnement\n");
-    if (pause)
+  if (action == GLFW_PRESS) {
+    if (key == GLFW_KEY_ESCAPE)
     {
-      glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      //glfwSetWindowShouldClose(window, GLFW_TRUE);
+      pause=!pause;
+      printf(pause ? "En pause\n" : "En fonctionnement\n");
+      if (pause)
+      {
+        glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      }
+      else
+      {
+        glfwSetWindowTitle(window, APPNAMEVERSION);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
     }
-    else
-    {
-      glfwSetWindowTitle(window, APPNAMEVERSION);
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (key == GLFW_KEY_BACKSPACE)
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (key == GLFW_KEY_SPACE)
+      upar = true;
+    if (key == GLFW_KEY_LEFT_CONTROL)
+      downar = true;
+    if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+      forwardar = true;
+    }
+    if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
+      backwardar = true;
+    }
+    if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+      rightar = true;
+    }
+    if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
+      leftar = true;
     }
   }
-  if (key == GLFW_KEY_BACKSPACE)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
-  if (key == GLFW_KEY_SPACE && stateControl != GLFW_PRESS)
-    camPosY += speed;
-  if (key == GLFW_KEY_SPACE && stateControl == GLFW_PRESS)
-    camPosY -= speed;
-  if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-    camPosX += speed*ez[0];
-    camPosY += speed*ez[1];
-    camPosZ += speed*ez[2];
-  }
-  if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
-    camPosX -= speed*ez[0];
-    camPosY -= speed*ez[1];
-    camPosZ -= speed*ez[2];
-  }
-  if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-    camPosX += speed*ex[0];
-    camPosY += speed*ex[1];
-    camPosZ += speed*ex[2];
-  }
-  if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
-    camPosX -= speed*ex[0];
-    camPosY -= speed*ex[1];
-    camPosZ -= speed*ex[2];
+  else if (action == GLFW_RELEASE) {
+    if (key == GLFW_KEY_SPACE)
+      upar = false;
+    if (key == GLFW_KEY_LEFT_CONTROL)
+      downar = false;
+    if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+      forwardar = false;
+    }
+    if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S ) {
+      backwardar = false;
+    }
+    if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+      rightar = false;
+    }
+    if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A ) {
+      leftar = false;
+    }
   }
 }
 
@@ -124,10 +143,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
   int stateControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
   
   // we only use yoffset as it is present on normal mice
-  if (DEBUG_MODE % 5 == 0)
+  if (DEBUG_MODE % 5 == 0) {
     printf("scroll value : %f | precision : %f | ",yoffset, camPrecision);
     printf((stateControl == GLFW_PRESS) ? "ctrl -> speed" : "Zooming");
     printf("\n");
+  }
   if (stateControl == GLFW_PRESS) {
     camPrecision += yoffset/2;
     if (camPrecision <= 1)
@@ -202,7 +222,7 @@ int main (){
   glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to unbind in the setupVertexArray function and then bind here, but we'll do so for clarity, organization, and avoiding possible bugs in future
     
   GLuint quad_shader = glCreateProgram();
-  int compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", "shaders/quad.fs");
+  int compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", SCENE);
   if(compilerInfo>0){
   	return compilerInfo;
   }
@@ -256,6 +276,31 @@ int main (){
     ey[2] = ex[0] * ez[1] - ex[1] * ez[0];
     //crossProduct(ex,ez);
 
+  if (upar)
+    camPosY += speed;
+  if (downar)
+    camPosY -= speed;
+  if (forwardar) {
+    camPosX += speed*ez[0];
+    camPosY += speed*ez[1];
+    camPosZ += speed*ez[2];
+  }
+  if (backwardar) {
+    camPosX -= speed*ez[0];
+    camPosY -= speed*ez[1];
+    camPosZ -= speed*ez[2];
+  }
+  if (rightar) {
+    camPosX += speed*ex[0];
+    camPosY += speed*ex[1];
+    camPosZ += speed*ex[2];
+  }
+  if (leftar) {
+    camPosX -= speed*ex[0];
+    camPosY -= speed*ex[1];
+    camPosZ -= speed*ex[2];
+  }
+
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
@@ -277,7 +322,7 @@ int main (){
     glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*multiplicatorFov);
+		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*fovValue*multiplicatorFov);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 
