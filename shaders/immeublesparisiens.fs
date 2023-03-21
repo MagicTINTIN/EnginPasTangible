@@ -80,7 +80,7 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return (impact.y+1.)*.05*vec3(.5,.7,1.);
+	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
 	vec3 normale=grad(impact.xyz);
 	vec3 sunPos=vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
 	return vec3(clamp(0.,1.,dot(sunPos-impact.xyz,normale)));//normale;
