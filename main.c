@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
+
+#define SCENE "shaders/default.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -141,10 +143,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
   int stateControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
   
   // we only use yoffset as it is present on normal mice
-  if (DEBUG_MODE % 5 == 0)
+  if (DEBUG_MODE % 5 == 0) {
     printf("scroll value : %f | precision : %f | ",yoffset, camPrecision);
     printf((stateControl == GLFW_PRESS) ? "ctrl -> speed" : "Zooming");
     printf("\n");
+  }
   if (stateControl == GLFW_PRESS) {
     camPrecision += yoffset/2;
     if (camPrecision <= 1)
@@ -219,7 +222,7 @@ int main (){
   glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to unbind in the setupVertexArray function and then bind here, but we'll do so for clarity, organization, and avoiding possible bugs in future
     
   GLuint quad_shader = glCreateProgram();
-  int compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", "shaders/quad.fs");
+  int compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", SCENE);
   if(compilerInfo>0){
   	return compilerInfo;
   }
@@ -319,7 +322,7 @@ int main (){
     glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*multiplicatorFov);
+		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*fovValue*multiplicatorFov);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 
