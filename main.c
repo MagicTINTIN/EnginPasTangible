@@ -8,7 +8,7 @@
 #include "./Libraries/stb/stb_image.h"
 #include "headers/shader.h"
 
-#define SCENE "shaders/default.fs"
+#define SCENE "shaders/couleurs.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##

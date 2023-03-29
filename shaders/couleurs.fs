@@ -63,27 +63,37 @@ float SDF_Box(vec3 p, vec3 t){
 	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
 }
 
-float SDF_Global(vec3 p){
-	return smin(SDF_Box(p,vec3(2.,.5,2.)),SDF_Sphere(p+vec3(0.,2.5*cos(Time*.4),0.),1.),1.);
+vec4 SDF_Global(vec3 p){
+	float box = SDF_Box(p,vec3(2.,.5,2.));
+	vec3 c1= vec3(1.,.8,0.);
+	float mini = box;
+	vec3 cFinale=c1;
+	
+	float sphere =SDF_Sphere(p+vec3(0.,2.5*cos(Time*.4),0.),1.);
+	vec3 c2=vec3(1.,0.,0.);
+	mini=smin(box,sphere,1.);
+	cFinale=mix(c2,c1,abs(sphere-mini));
+	
+	return vec4(mini,cFinale);
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	float dist;
+	vec4 dist;
 	for(int i=0;i<60;i++){
 		dist=SDF_Global(pos);
-		pos+=dist*dir;
-		if(dist<=.01) return vec4(pos,1.);
-		if(dist>=20.0) return vec4(pos,-1.);
+		pos+=dist.x*dir;
+		if(dist.x<=.01) return vec4(pos,1.);
+		if(dist.x>=20.0) return vec4(pos,-1.);
 	}
-	return vec4(pos,-1.);
+	return vec4(pos,1.);
 }
 
 vec3 grad(vec3 p){
 	vec2 epsilon = vec2(.01,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy)-SDF_Global(p-epsilon.xyy),
-												SDF_Global(p+epsilon.yxy)-SDF_Global(p-epsilon.yxy),
-												SDF_Global(p+epsilon.yyx)-SDF_Global(p-epsilon.yyx)));
+	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
+												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
+												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
@@ -97,7 +107,9 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	float specular=clamp(dot(symetrique,sunPos)*.5,0.,1.);
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(dot(sunPos,normale),0.,1.))*f+vec3(specular);
+	vec3 couleur=SDF_Global(impact.xyz).yzw;
+	
+	return couleur*clamp(dot(sunPos,normale),0.,1.)*f+vec3(specular);
 }
 
 float Mandel(vec2 co){
@@ -105,7 +117,7 @@ float Mandel(vec2 co){
 	float limf=100.0;
 	float cf=0.0;
 	int c;
-	for(c=0;c<30;c++){
+	for(c=0;c<300;c++){
 		coo=vec2(pow(coo.x,2.0)-pow(coo.y,2.0)+co.x,2.*coo.x*coo.y+co.y);
 		if(length(coo)>=2.0){
 			return cf/limf;
@@ -130,6 +142,6 @@ void main(){
 	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
 	
-  //float c=Mandel(FragCoord*1.5);
-  FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
+  FragColor =vec4(vec3(Mandel(vec2(-.75,-.1)+FragCoord*2.0/pow(Time,Time))),1.);//vec2(.3885959955,.133913)
+  //FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
 }
