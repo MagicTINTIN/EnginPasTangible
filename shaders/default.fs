@@ -33,10 +33,9 @@ vec3 infinity(vec3 pos,vec3 box){
 	return mod(pos+.5*box,box)-.5*box;
 }
 
-
-vec3 repeter(vec3 p, float size, vec3 repet)
+vec3 repeat(vec3 p, vec3 size, vec3 repet)
 {
-    return p-size*clamp(round(p/size),-repet,repet);
+    return p-size*clamp(vec3(round(p.x/size.x),round(p.y/size.y),round(p.z/size.z)),-repet,repet);
 }
 
 float SDF_Box_Frame( vec3 p, vec3 b, float e )
