@@ -29,7 +29,7 @@ vec3 infinity(vec3 pos,vec3 box){
 }
 
 
-vec3 repeter(vec3 p, vec3 size, vec3 repet)
+vec3 repeat(vec3 p, vec3 size, vec3 repet)
 {
     return p-size*clamp(vec3(round(p.x/size.x),round(p.y/size.y),round(p.z/size.z)),-repet,repet);
 }
@@ -53,16 +53,21 @@ float SDF_Sphere(vec3 p,float r){
 	return length(p)-r;
 }
 
+float SDF_Box(vec3 p, vec3 t){
+	vec3 q=abs(p)-t;
+	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
+}
+
 float SDF_Global(vec3 p){
 	//return SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(.5,.5,.5),.1);
 	//return max(SDF_Sphere(p,.5),-SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(1.,1.,1.),.3));//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
-	return min(SDF_Box_Frame(repeter(p, vec3(4.,2.,10.), vec3(2., 25., 5.)), vec3(1.,1.,1.),.1),p.y); //infinity(p, vec(0.3, 0.2, 0.5))
+	return min(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),SDF_Box(p,vec3(20.,0.1,50.))); //infinity(p, vec(0.3, 0.2, 0.5))
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
 	float dist;
-	for(int i=0;i<30;i++){
+	for(int i=0;i<260;i++){
 		dist=SDF_Global(pos);
 		pos+=dist*dir;
 		if(dist<=.01) return vec4(pos,1.);
@@ -80,10 +85,23 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
+	
+	//
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.5*Time,.0,0)));//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
+	//return vec3(clamp(0.,1.,dot(sunPos,normale)));//normale; ---impact.xyz
+
+	float dotdirsun = dot(sunPos, dir);
+	//if(impact.w<0.) return vec3(.3,.1+.7*dotdirsun,0.2+.8*dotdirsun)+.05*clamp(origin.y-10.,-10.,10.); //(.5,.8,.9)
+	if(impact.w<0.) return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;//+.05*clamp(origin.y-10.,-10.,10.); //(.5,.8,.9)
 	vec3 normale=grad(impact.xyz);
-	vec3 sunPos=vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	return vec3(clamp(0.,1.,dot(sunPos-impact.xyz,normale)));//normale;
+
+	vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
+	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+	//float g=reflexion.w<0.?1.5:1.;
+	//vec3 sunPos=vec3(0.,10.,.5);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
+	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
+	float f=ombre.w<0.?1.:.5;
+	return vec3(clamp(0.,1.,dot(sunPos,normale)))*f; //*
 }
 
 float Mandel(vec2 co){

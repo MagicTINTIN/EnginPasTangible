@@ -54,5 +54,10 @@ Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)
 
 ### V0.2.5
 
-![Capture d'écran de la toute première version](./screenshots/EnginPasTangiblev0.2.5.gif)<br>
+![Capture d'écran de la première version avec une source lumineuse](./screenshots/EnginPasTangiblev0.2.5.gif)<br>
 Rotation autour du centre contrôlée par la souris (v0.2.5)
+
+### V0.4.2
+
+![Capture d'écran des premiers essais des ombres](./screenshots/EnginPasTangiblev0.4.2.gif)<br>
+Cycle jour nuit dans une scene avec des tours et déplacements clavier souris (v0.4.2)
