@@ -12,11 +12,6 @@ in float FacteurLargeur;
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
 
-float smin(float a, float b, float k){
-	float h=clamp(.5+.5*(b-a)/k,0.,1.0);
-	return mix(b,a,h) - k*h*(1.-h);
-}
-
 vec3 rotate(vec3 pos, vec3 angles){
 	float ca=cos(angles.x);
 	float sa=sin(angles.x);
@@ -63,8 +58,35 @@ float SDF_Box(vec3 p, vec3 t){
 	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float SDF_Box( in vec2 p, in vec2 b )
+{
+    vec2 d = abs(p)-b;
+    return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+}
+
+float SDF_Cross(vec3 p )
+{
+  float da = SDF_Box(p.xy,vec2(1.0));
+  float db = SDF_Box(p.yz,vec2(1.0));
+  float dc = SDF_Box(p.zx,vec2(1.0));
+  return min(da,min(db,dc));
+}
+
 float SDF_Global(vec3 p){
-	return smin(SDF_Box(p,vec3(2.,.5,2.)),SDF_Sphere(p+vec3(0.,2.5*cos(Time*.4),0.),1.),1.);
+   float d = SDF_Box(p,vec3(1.0));
+
+   float s = 1.0;
+   for( int m=0; m<5; m++ )
+   {
+      vec3 a = mod( p*s, 2.0 )-1.0;
+      s *= 3.0;
+      vec3 r = 1.0 - 3.0*abs(a);
+
+      float c = SDF_Cross(r)/s;
+      d = max(d,c);
+   }
+
+   return d;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
@@ -73,7 +95,7 @@ vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1
 	for(int i=0;i<60;i++){
 		dist=SDF_Global(pos);
 		pos+=dist*dir;
-		if(dist<=.01) return vec4(pos,1.);
+		if(dist<=.001) return vec4(pos,1.);
 		if(dist>=20.0) return vec4(pos,-1.);
 	}
 	return vec4(pos,-1.);
@@ -90,14 +112,13 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);//(impact.y+1.)*.05*vec3(.5,.7,1.);
 	vec3 normale=grad(impact.xyz);
-	vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
+	//vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
 	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
 	//float g=reflexion.w<0.?1.5:1.;
 	vec3 sunPos=vec3(0.,.7,.7);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	float specular=clamp(dot(symetrique,sunPos)*.5,0.,1.);
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(dot(sunPos,normale),0.,1.))*f+vec3(specular);
+	return vec3(clamp(dot(sunPos,normale),0.,1.))*f;
 }
 
 float Mandel(vec2 co){
