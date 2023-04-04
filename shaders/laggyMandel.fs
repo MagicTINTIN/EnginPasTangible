@@ -112,14 +112,22 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	return couleur*clamp(dot(sunPos,normale),0.,1.)*f+vec3(specular);
 }
 
-float Mandel(vec2 co){
-	vec2 coo = co.xy;
+float Mandel(double cox,double coy){
+	//dvec2 coo = co;
+	double cx=cox;//double(co.x);
+	double cy=coy;//double(co.y);
+	double tx,ty;
+	double two=double(2.);
 	float limf=100.0;
 	float cf=0.0;
 	int c;
-	for(c=0;c<300*2;c++){
-		coo=vec2(pow(coo.x,2.0)-pow(coo.y,2.0)+co.x,2.*coo.x*coo.y+co.y);
-		if(length(coo)>=2.0){
+	for(c=0;c<300*5;c++){
+		tx=cx;
+		ty=cy;
+		cx=tx*tx-ty*ty+cox;//double(co.x);
+		cy=two*tx*ty+coy;//double(co.y);
+		//coo=dvec2(pow(coo.x,2.0)-pow(coo.y,2.0)+co.x,2.*coo.x*coo.y+co.y);
+		if(cx*cx+cy*cy>=two){//length(coo)>=2.0){
 			return cf/limf;
 		}
 		cf+=1.0;
@@ -142,6 +150,6 @@ void main(){
 	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
 	
-  //FragColor =vec4(vec3(Mandel(vec2(-.1037042,-.9361835)+FragCoord*4.0/pow(2,min(17.,Time)))),1.);//vec2(.3885959955,.133913)
-  FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
+  FragColor =vec4(vec3(Mandel(double(-.4621603)+double(FragCoord.x*2.0)/double(pow(2.,Time)),double(-.5823998)+double(FragCoord.y*2.0)/double(pow(2.,Time)))),1.);//vec2(-.4621603,-.5823998)+FragCoord*2.0/pow(2,Time))),1.);//vec2(.3885959955,.133913)
+  //FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
 }
