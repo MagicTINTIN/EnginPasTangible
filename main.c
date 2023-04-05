@@ -12,7 +12,7 @@ shaders/default.fs
 shaders/immeublesparisiens.fs
 shaders/joliesformes.fs
 */
-#define SCENE "shaders/default.fs"
+#define SCENE "shaders/couleurs.fs"
 //#define SCENE "shaders/joliesformes.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
