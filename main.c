@@ -10,8 +10,10 @@
 /* SCENE LIST 
 shaders/default.fs
 shaders/immeublesparisiens.fs
+shaders/couleurs.fs
+shaders/sierp.fs
 */
-#define SCENE "shaders/couleurs.fs"
+#define SCENE "shaders/sierp.fs"
 //#define SCENE "shaders/immeublesparisiens.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
@@ -24,7 +26,7 @@ shaders/immeublesparisiens.fs
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 2
+#define DEBUG_MODE 1
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
