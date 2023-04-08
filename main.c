@@ -12,6 +12,7 @@ shaders/default.fs
 shaders/immeublesparisiens.fs
 shaders/couleurs.fs
 shaders/sierp.fs
+shaders/joliesformes.fs
 */
 #define SCENE "shaders/sierp.fs"
 //#define SCENE "shaders/immeublesparisiens.fs"
