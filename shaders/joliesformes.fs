@@ -58,10 +58,46 @@ float SDF_Box(vec3 p, vec3 t){
 	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float SDF_Torus( vec3 p, vec2 t )
+{
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+
+float SDF_DeathStar( in vec3 p2, in float ra, float rb, in float d )
+{
+  // sampling independent computations (only depend on shape)
+  float a = (ra*ra - rb*rb + d*d)/(2.0*d);
+  float b = sqrt(max(ra*ra-a*a,0.0));
+	
+  // sampling dependant computations
+  vec2 p = vec2( p2.x, length(p2.yz) );
+  if( p.x*b-p.y*a > d*max(b-p.y,0.0) )
+    return length(p-vec2(a,b));
+  else
+    return max( (length(p          )-ra),
+               -(length(p-vec2(d,0))-rb));
+}
+
+float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
+{
+  // sampling independent computations (only depend on shape)
+  float w = sqrt(r*r-h*h);
+  
+  // sampling dependant computations
+  vec2 q = vec2( length(p.xz), p.y );
+  return ((h*q.x<w*q.y) ? length(q-vec2(w,h)) : 
+                          abs(length(q)-r) ) - t;
+}
+
+
 float SDF_Global(vec3 p){
 	//return SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(.5,.5,.5),.1);
 	//return max(SDF_Sphere(p,.5),-SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(1.,1.,1.),.3));//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
-	return min(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),SDF_Box(p,vec3(20.,0.1,50.))); //infinity(p, vec(0.3, 0.2, 0.5))
+	//return min(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),SDF_Box(p,vec3(20.,0.1,50.))); //infinity(p, vec(0.3, 0.2, 0.5))
+    float m = SDF_Torus(p, vec2(1.,0.2));
+    m = min(m, SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.));
+    return m;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
@@ -87,7 +123,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	
 	//
-	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.5*Time,.0,0)));//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
 	//return vec3(clamp(0.,1.,dot(sunPos,normale)));//normale; ---impact.xyz
 
 	float dotdirsun = dot(sunPos, dir);
