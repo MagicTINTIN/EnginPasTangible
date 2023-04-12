@@ -8,6 +8,7 @@ in vec3 Ez;
 in vec3 CamPos;
 in float fovValue;
 in float FacteurLargeur;
+in float OrthoView;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
@@ -170,6 +171,10 @@ void main(){
 	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
 	
+  if(OrthoView == 1.){
   //float c=Mandel(FragCoord*1.5);
-  FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
+  	FragColor=vec4(Get_Color(posCam+fovValue*FragCoord.x*normalize(Ex)+fovValue*FragCoord.y*normalize(Ey),normalize(Ez)),1.);//c,c,c,1.);
+  }else{
+  	FragColor=vec4(Get_Color(posCam,dir),1.);//c,c,c,1.);
+  }
 }
