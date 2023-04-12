@@ -13,8 +13,9 @@ shaders/immeublesparisiens.fs
 shaders/couleurs.fs
 shaders/sierp.fs
 shaders/joliesformes.fs
+shaders/orthogonalView.fs
 */
-#define SCENE "shaders/sierp.fs"
+#define SCENE "shaders/orthogonalView.fs"
 //#define SCENE "shaders/immeublesparisiens.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
