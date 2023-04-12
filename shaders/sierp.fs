@@ -90,24 +90,7 @@ float SDF_Triangle( vec3 p, vec3 a, vec3 b, vec3 c )
      dot(nor,pa)*dot(nor,pa)/dot2(nor) );
 }
 
-float SDF_tetra(vec3 p,float h){
-	//float hh = h*.5;
-	//float c1=h/sqrt(3);
-	//vec3 a = vec3(0.,hh,0.);
-	//vec3 b = vec3(0.,-hh,hh);
-	//vec3 c = vec3(c1,-hh,-hh);
-	//vec3 d = vec3(-c1,-hh,-hh);
-	float f1=1./sqrt(3.);
-	float f2=1./sqrt(6.);
-	vec3 a = vec3(0.);
-	vec3 o = vec3( 1.,-f1  ,-f2 );
-	vec3 b = vec3(-1.,-f1  ,-f2 )-o;
-	vec3 c = vec3(0. ,2.*f1,-f2 )-o;
-	vec3 d = vec3(0. ,0.  ,3.*f2)-o;
-	return min(SDF_Triangle(p,a,b,c),min(SDF_Triangle(p,a,b,d),min(SDF_Triangle(p,a,c,d),SDF_Triangle(p,b,c,d))));
-}
-
-float SDF_tetra2(vec3 ps,float s){
+float SDF_tetra(vec3 ps,float s){
 	vec3 p=ps+vec3(s);
 	return (max(
 	    abs(p.x+p.y)-p.z,
@@ -116,29 +99,8 @@ float SDF_tetra2(vec3 ps,float s){
 }
 
 float SDF_Sierp(vec3 p,float s,int n){
-	//float ss=s*.5;
-	//float c=s/sqrt(3);
-	//float c1=s/sqrt(3);
-	float d=pow(2.,n);
-	vec3 ps=p/s;
-	
-	for (int i=0;i<n;i++){
-		ps=symetry(ps,normalize(vec3(1,-1./sqrt(3.),-4./sqrt(6.))),d);
-		ps=symetry(ps,         (vec3(1.,0.,0.)),d);
-		ps=symetry(ps,normalize(vec3(1.,-3./sqrt(3.),0.)),d);
-		d*=.5;
-		
-	}
-	
-	return SDF_tetra(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
-}
-
-float SDF_Sierp2(vec3 p,float s,int n){
-	//float ss=s*.5;
-	//float c=s/sqrt(3);
-	//float c1=s/sqrt(3);
 	float d=sqrt(2)*pow(2.,n)*s;
-	vec3 ps=p;// /s;
+	vec3 ps=p;
 	
 	for (int i=0;i<n;i++){
 		ps=symetry(ps,normalize(vec3(0.,1.,-1.)),0.);
@@ -147,11 +109,11 @@ float SDF_Sierp2(vec3 p,float s,int n){
 		d*=.5	;
 	}
 	
-	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
+	return SDF_tetra(ps,s);
 }
 
 float SDF_Global(vec3 p){
-	return SDF_Sierp2(p-vec3(1.),pow(2.,-6),7);
+	return SDF_Sierp(p-vec3(1.),pow(2.,-6),7);
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
