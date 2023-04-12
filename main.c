@@ -15,8 +15,7 @@ shaders/sierp.fs
 shaders/joliesformes.fs
 shaders/orthogonalView.fs
 */
-#define SCENE "shaders/orthogonalView.fs"
-//#define SCENE "shaders/immeublesparisiens.fs"
+#define SCENE "shaders/default.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -25,10 +24,11 @@ shaders/orthogonalView.fs
  * 2 for FPS
  * 3 for cursor position
  * 5 for scroll level and precision
+ * 7 for orthogonal information
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 1
+#define DEBUG_MODE 7
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;
@@ -61,6 +61,7 @@ bool leftar = false;
 bool rightar = false;
 bool forwardar = false;
 bool backwardar = false;
+int orthoView = 0;
 
 float fovValue=1.0;
 //281=3.13/2 * 180
@@ -106,6 +107,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       {
         glfwSetWindowTitle(window, APPNAMEVERSION);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
+    }
+    if (key == GLFW_KEY_TAB) {
+      orthoView = (orthoView + 1) % 2;
+      if (DEBUG_MODE % 7 == 0) {
+        printf("Orthogonal view : ");
+        printf((orthoView == 1) ? "on" : "off");
+        printf("\n");
       }
     }
     if (key == GLFW_KEY_BACKSPACE)
@@ -331,7 +340,8 @@ int main (){
     glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), fovValue*fovValue*multiplicatorFov);
+		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), (orthoView == 1) ? 2/(fovValue*fovValue*multiplicatorFov) : fovValue*fovValue*multiplicatorFov);
+    glUniform1i(glGetUniformLocation(quad_shader, "iOrthoView"), orthoView);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 

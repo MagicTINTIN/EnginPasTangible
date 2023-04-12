@@ -11,6 +11,7 @@ out vec3 Ez;
 out vec3 CamPos;
 out float fovValue;
 out float FacteurLargeur;
+out float OrthoView;
 
 uniform float iTime;
 uniform vec3 iEx;
@@ -19,6 +20,7 @@ uniform vec3 iEz;
 uniform vec3 iCamPos;
 uniform float iFovValue;
 uniform float iFacteurLargeur;
+uniform int iOrthoView;
 
 
 void main()
@@ -32,4 +34,5 @@ void main()
    CamPos = iCamPos;
    fovValue = iFovValue;
    FacteurLargeur=iFacteurLargeur;
+   OrthoView = iOrthoView;
 }
