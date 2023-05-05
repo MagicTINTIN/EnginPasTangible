@@ -78,3 +78,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+LaTeX/main.fdb_latexmk
+LaTeX/main.fls
+LaTeX/main.log
+LaTeX/main.pdf
+LaTeX/main.synctex.gz
