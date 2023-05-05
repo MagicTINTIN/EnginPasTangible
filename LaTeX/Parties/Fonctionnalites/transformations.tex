@@ -1,0 +1,33 @@
+\subsection{Transformations}
+Pour toutes les transformations sur les points des volumes, il suffit d'appliquer la transformation inverse sur la position de ce point.\\
+Par exemple, si l'on souhaite translater un point vers les $x$ croissants, il faut réduire d'autant la position en $x$.
+
+\subsubsection{Rotation autour des axes XYZ}
+\begin{align*}
+    R(x,y,z)
+    =& R_{ex}(x)R_{ey}(y)R_{ez}(z) \\
+    = &
+    \begin{bmatrix}
+    cos(x) & -sin(x) & 0 \\
+    sin(x) & cos(x) & 0 \\
+    0 & 0 & 1 
+    \end{bmatrix}
+    \begin{bmatrix}
+    cos(y) & 0 & sin(y) \\
+    0 & 1 & 0 \\
+    -sin(y) & 0 & cos(y) 
+    \end{bmatrix}
+    \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & cos(z) & -sin(z) \\
+    0 & sin(z) & cos(z) 
+    \end{bmatrix}\\
+    = & \begin{bmatrix}
+    cos(y)cos(z) & sin(x)sin(y)cos(z) & cos(x)sin(y)cos(z)+sin(x)sin(z) \\
+    cos(y)sin(z) & sin(x)sin(y)sin(z)+cos(x)cos(z) & cos(x)sin(y)sin(z)-sin(x)cos(z) \\
+    -sin(y) & sin(x)cos(y) & cos(x)cos(y)
+    \end{bmatrix} \\
+\end{align*}
+
+\subsubsection{Duplication des volumes}
+

@@ -1,0 +1,16 @@
+\subsection{Prérequis : Signed Distance Function}
+
+Le Ray Marching repose sur une fonction appelée SDF : Signed Distance Function. Ainsi, nous avons :
+\begin{flalign*}
+SDF : \mathbb{R}^4 &\rightarrow \mathbb{R}\\
+    (x,y,z,t) &\xmapsto{} SDF(x,y,z,t)\\
+\end{flalign*}
+        
+Cette fonction doit retourner pour tout point M(t) la distance entre ce point et l'objet le plus proche. Cette distance peut et doit être négative si le point est à l'interieur d'une figure. Le temps permet de créer des objets dont la position, la forme, etc. dépendent du temps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% il faut déplacer + changer ça vers la partie Fonctionnement.    
+Ainsi, voici la SDF pour une scene 3D ne contenant qu'une sphere de centre o(t):
+\begin{flalign*}
+    SDF\_Sphere : \mathbb{R}^4 &\rightarrow \mathbb{R}\\
+    P(x,y,z,t) &\xmapsto{} length(P-o(t)) - r
+\end{flalign*} Avec r le rayon de la sphere

@@ -4,10 +4,6 @@
 % Replace `english' with e.g. `spanish' to change the document language
 \usepackage[french]{babel}
 
-% resolve no citation problem
-\nocite{*}
-%\usepackage[...,backend=bibtex]{biblatex}
-
 % Set page size and margins
 % Replace `letterpaper' with `a4paper' for UK/EU standard size
 \usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
@@ -25,7 +21,7 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 \title{Moteur graphique}
-\author{Victor LASSERRE \& Valentin SERVIERES}
+\author{Valentin SERVIERES \& Victor LASSERRE}
 
 \begin{document}
 \maketitle
@@ -42,9 +38,7 @@
 \input{Parties/Conclusion}
 
 \clearpage
-
-\end{document}
-
 \bibliographystyle{alpha}
 \bibliography{sample}
 
+\end{document}
