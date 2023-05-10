@@ -2,10 +2,10 @@
 \subsubsection{Calcul de normale}
 Pour les calculs de couleurs, on va avoir besoin de la normale de la surface de l'objet "rencontré" par le rayon.
 \begin{align*}
-\Vec{N}=Normalize(\Vec{\nabla}SDF\_Scene(P))
+\Vec{N}=normalize(\Vec{\nabla}SDF\_Scene(P))
 \end{align*}
-avec $Normalize(u)=\frac{u}{\|u\|}$\\
+avec $normalize(\cdot )=\frac{\cdot }{\|\cdot \|}$\\
 \\
-\textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. On evitera donc d'utiliser certaines figures, au profit d'autres ayant des propriétés plus satisfaisantes.
+\textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. De plus, ces points critiques sont négligeables par rapport à la surface totale de l'objet. On évitera donc d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités.
 \subsubsection{Calcul de l'éclairage}
 On pose $SunDir \in \mathbb{R}^3$ la direction \textbf{normalisée} du soleil.
