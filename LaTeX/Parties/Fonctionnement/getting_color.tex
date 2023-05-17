@@ -14,3 +14,9 @@ On pose $LightPos \in \mathbb{R}^3$ la position d'une source de lumière et $Lig
 \begin{align*}
     Contribution=max(\left\langle \Vec{N},\ normalize(Lightpos-P) \right\rangle,\ 0) \times LightColor
 \end{align*}
+Il suffit de sommer la contribution de chaque source i de lumière :
+\begin{align*}
+    Couleur\_Pixel=\sum_{i=1}^{n} max(\left\langle \Vec{N},\ normalize(Lightpos_i-P) \right\rangle,\ 0) \times LightColor_i
+\end{align*}
+Avec n le nombre de sources de lumière
+\textbf{Remarque} : Il n'est pas necessaire de gerer des problème de dépassement de couleur car le shader le fait lui-même.
