@@ -1,5 +1,3 @@
 shaders/*.fs linguist-language=glsl
 *.fs linguist-language=glsl
-Latex/*.tex linguist-language=tex
-
-* linguist-language=js
+*.tex linguist-language=tex
