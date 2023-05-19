@@ -1,6 +1,6 @@
 \subsection{Methode de calcul : les Shaders}
 
-La méthode utilisée pour l'affichage des éléments à l'écran est un Shader. Il existe deux types complémentaires de Shaders : les Vertex Shaders qui "projettent" des Vertex (triangles) positionnés en 3D sur l'écran (mais seulement un nombre très limité) et les Fragments Shaders qui déterminent la couleur de chacuns des pixels des Vertex projetés sur l'écran. \\
+La méthode utilisée pour l'affichage des éléments à l'écran est un Shader. Il existe deux types complémentaires de Shaders : les Vertex Shaders qui "projettent" des triangles positionnés en 3D sur l'écran (mais seulement un nombre très limité) et les Fragments Shaders qui déterminent la couleur de chacuns des pixels des précédents triangles. \\
 Dans notre cas, nous n'utilisons que deux triangles qui forment le rectangle de l'écran. Notre moteur 3D repose principalement sur les Fragments Shaders.\\
 On peut décrire un Fragment Shader comme ceci :
 \begin{flalign*}
@@ -9,3 +9,4 @@ On peut décrire un Fragment Shader comme ceci :
 \end{flalign*}
 On pourra également avoir besoin de rajouter des entrées "input" comme le temps, la position du curseur, le FOV, ect...\\
 Il faut donc créer cette fonction !\\
+$\mathbf{Remaque}$ : Cette méthode permet de paralléliser les calculs pour chaque pixel.

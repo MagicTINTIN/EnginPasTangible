@@ -1,0 +1,5 @@
+shaders/*.fs linguist-language=glsl
+*.fs linguist-language=glsl
+*.tex linguist-language=tex
+
+Libraries/** linguist-vendored

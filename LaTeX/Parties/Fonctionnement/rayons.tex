@@ -1,17 +1,22 @@
+\newpage
 \subsection{Création des rayons projetés}
 \subsubsection{Création d'une base orthonormée pour la caméra}
 
 On suppose que l'on connait $tilt$ et $pan$ qui sont les angles de la caméra donnés par le curseur. 
 \begin{align*}
-    e_z =&  [cos(tilt)\times sin(pan) , sin(tilt) , cos(tilt)\times cos(pan)]\\
+    e_z =&  (cos(tilt)\times sin(pan) ,\ sin(tilt) ,\ cos(tilt)\times cos(pan))\\
     e_x =&  normalize(e_z \wedge (0,1,0) )\\
     e_y =& e_x \wedge e_z\\
 \end{align*}
-\textbf{Remarque} : tous ces vecteurs sont orthonormés.
+
+Avec $normalize(\cdot ) = \frac{\cdot }{\| \cdot  \|}$
+
+\textbf{Remarque} : Cette base de vecteurs est orthonormée.
 \subsubsection{Création des vecteurs directeur pour chaque pixel}
 Avec $x$ et $y$ les coordonées du pixel et FOV le champ de vision $(x,y,FOV\in \mathbb{R})$: 
 \begin{align*}
-    Direction &= x\times e_x + y\times e_y + FOV\times e_z\\
-    Direction_{Normalized} &= \frac{Direction}{\|Direction\|}
+    Direction &= normalize(x\times e_x + y\times e_y + FOV\times e_z)\\
 \end{align*}
+
 On obtient ainsi un vecteur directeur pour chaque pixel de l'écran.
+\\INSERER VECTEURS BLENDER
