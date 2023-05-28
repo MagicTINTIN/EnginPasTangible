@@ -147,6 +147,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
+	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
 	
 	return couleur*clamp(dot(sunPos,normale),0.,1.)*f; //*
 }

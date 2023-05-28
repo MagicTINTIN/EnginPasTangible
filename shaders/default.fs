@@ -163,7 +163,9 @@ vec2 SDF_Global(vec3 p){
 	// 180 : cyan
 	// 240 : bleu
 	// 300 : rose
-    res=opu(res,vec2(SDF_Sphere(p,.2),100));
+	// 360 : noir
+	// 420 : white
+    res=opu(res,vec2(SDF_Sphere(p,.2),360));
 	return res;
 }
 
@@ -208,13 +210,15 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	float interm = chroma*(1-abs(mod(hue, 2) - 1));
 
 	vec3 couleur = vec3(1.);
-	     if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+
+	if (hue<=1.0) couleur = vec3(chroma,interm,0.);
 	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
 	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
 	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
-	
+	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
+
 	return couleur*clamp(dot(sunPos,normale),0.,1.)*f;
 }
 
