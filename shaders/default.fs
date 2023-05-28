@@ -150,41 +150,58 @@ float SDF_Sierp2(vec3 p,float s,int n){
 	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
 }
 
-float SDF_Global(vec3 p){
-	return SDF_Box_Frame(p,vec3(1.),.1);
+vec2 opu(vec2 v1, vec2 v2){
+	return (v1.x<v2.x) ? v1 : v2;
+}
+
+vec2 SDF_Global(vec3 p){
+    vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),4.5); //deuxième value:couleur
+	                ///couleurs dispo (dans l'ordre 1,2,3,...) : Red,Green,Blue,Yellow,Magenta,Cyan,White
+    res=opu(res,vec2(SDF_Sphere(p,.2),1.6));
+	return res;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	float dist;
-	for(int i=0;i<60;i++){
+	vec2 dist;
+	for(int i=0;i<260;i++){
 		dist=SDF_Global(pos);
-		pos+=dist*dir;
-		if(dist<=.001) return vec4(pos,1.);
-		if(dist>=20.0) return vec4(pos,-1.);
+		pos+=dist.x*dir;
+		if(dist.x<=.01) return vec4(pos,dist.y);
+		if(dist.x>=200.0) return vec4(pos,-1.);
 	}
 	return vec4(pos,-1.);
 }
 
 vec3 grad(vec3 p){
-	vec2 epsilon = vec2(.001,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy)-SDF_Global(p-epsilon.xyy),
-												SDF_Global(p+epsilon.yxy)-SDF_Global(p-epsilon.yxy),
-												SDF_Global(p+epsilon.yyx)-SDF_Global(p-epsilon.yyx)));
+	vec2 epsilon = vec2(.01,0.);
+	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
+												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
+												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);//(impact.y+1.)*.05*vec3(.5,.7,1.);
+	vec3 sunPos=vec3(0.,.7,.7);
+	//vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
+	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
+	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
 	vec3 normale=grad(impact.xyz);
-	//vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
-	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-	//float g=reflexion.w<0.?1.5:1.;
-	vec3 sunPos=vec3(0.,.7,.7);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	float specular=0.;//clamp(dot(symetrique,sunPos)*.5,0.,1.);
+	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(dot(sunPos,normale),0.,1.))*f+vec3(specular);
+	
+	float id=impact.w;
+	vec3 couleur = vec3(1.);
+	     if (id<=1.0) couleur = vec3(1.,0.,0.)*id;
+	else if (id<=2.0) couleur = vec3(0.,1.,0.)*(id-1.);
+	else if (id<=3.0) couleur = vec3(0.,0.,1.)*(id-2.);
+	else if (id<=4.0) couleur = vec3(1.,1.,0.)*(id-3.);
+	else if (id<=5.0) couleur = vec3(1.,0.,1.)*(id-4.);
+	else if (id<=6.0) couleur = vec3(0.,1.,1.)*(id-5.);
+	else if (id<=7.0) couleur = vec3(1.,1.,1.)*(id-6.);
+	
+	return couleur*clamp(dot(sunPos,normale),0.,1.)*f;
 }
 
 float Mandel(vec2 co){

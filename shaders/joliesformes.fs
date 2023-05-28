@@ -91,54 +91,56 @@ float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
                           abs(length(q)-r) ) - t;
 }
 
+vec2 opu(vec2 v1, vec2 v2){
+	return (v1.x<v2.x) ? v1 : v2;
+}
 
-float SDF_Global(vec3 p){
-	//return SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(.5,.5,.5),.1);
-	//return max(SDF_Sphere(p,.5),-SDF_Box_Frame(rotate(p,vec3(0.,.2*Time,0.)),vec3(1.,1.,1.),.3));//min(SDF_Box_Frame(p,vec3(.5,.5,.5),0.1),SDF_Circle(mod(p+vec3(.5),vec3(1.,1.,1.))-vec3(.5),.15));
-	//return min(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),SDF_Box(p,vec3(20.,0.1,50.))); //infinity(p, vec(0.3, 0.2, 0.5))
-    float m = SDF_Torus(p, vec2(1.,0.2));
-    m = min(m, SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.));
-    return m;
+vec2 SDF_Global(vec3 p){
+    vec2 res = vec2(SDF_Torus(p, vec2(1.,0.2)),1.0);
+    res = opu(res, vec2(SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.),2.));
+    return res;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	float dist;
+	vec2 dist;
 	for(int i=0;i<260;i++){
 		dist=SDF_Global(pos);
-		pos+=dist*dir;
-		if(dist<=.01) return vec4(pos,1.);
-		if(dist>=200.0) return vec4(pos,-1.);
+		pos+=dist.x*dir;
+		if(dist.x<=.01) return vec4(pos,dist.y);
+		if(dist.x>=200.0) return vec4(pos,-1.);
 	}
 	return vec4(pos,-1.);
 }
 
 vec3 grad(vec3 p){
 	vec2 epsilon = vec2(.01,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy)-SDF_Global(p-epsilon.xyy),
-												SDF_Global(p+epsilon.yxy)-SDF_Global(p-epsilon.yxy),
-												SDF_Global(p+epsilon.yyx)-SDF_Global(p-epsilon.yyx)));
+	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
+												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
+												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	
-	//
-	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	//return vec3(clamp(0.,1.,dot(sunPos,normale)));//normale; ---impact.xyz
-
-	float dotdirsun = dot(sunPos, dir);
-	//if(impact.w<0.) return vec3(.3,.1+.7*dotdirsun,0.2+.8*dotdirsun)+.05*clamp(origin.y-10.,-10.,10.); //(.5,.8,.9)
-	if(impact.w<0.) return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;//+.05*clamp(origin.y-10.,-10.,10.); //(.5,.8,.9)
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
+	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
+	if(impact.w<0.) return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;
 	vec3 normale=grad(impact.xyz);
-
-	vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
-	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-	//float g=reflexion.w<0.?1.5:1.;
-	//vec3 sunPos=vec3(0.,10.,.5);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
+	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(0.,1.,dot(sunPos,normale)))*f; //*
+	
+	float id=impact.w;
+	vec3 couleur = vec3(1.);
+	     if (id<=1.0) couleur = vec3(1.,0.,0.)*id;
+	else if (id<=2.0) couleur = vec3(0.,1.,0.)*(id-1.);
+	else if (id<=3.0) couleur = vec3(0.,0.,1.)*(id-2.);
+	else if (id<=4.0) couleur = vec3(1.,1.,0.)*(id-3.);
+	else if (id<=5.0) couleur = vec3(1.,0.,1.)*(id-4.);
+	else if (id<=6.0) couleur = vec3(0.,1.,1.)*(id-5.);
+	else if (id<=7.0) couleur = vec3(1.,1.,1.)*(id-6.);
+	
+	return couleur*clamp(dot(sunPos,normale),0.,1.)*f; //*
 }
 
 float Mandel(vec2 co){
