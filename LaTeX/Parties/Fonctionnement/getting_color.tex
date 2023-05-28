@@ -1,11 +1,22 @@
+\newpage
 \subsection{Calcul de la couleur à afficher}
 \subsubsection{Calcul de normale}
-Pour les calculs de couleurs, on va avoir besoin de la normale de la surface de l'objet "rencontré" par le rayon.
+Pour les calculs de couleurs, on va avoir besoin de la normale $\Vec{N}$ de la surface de l'objet "rencontré" par le rayon.
 \begin{align*}
-\Vec{N}=normalize(\Vec{\nabla}SDF\_Scene(P))
+    \Vec{N}=normalize(\Vec{\nabla}SDF\_Scene(P))
 \end{align*}
 avec $normalize(\cdot )=\frac{\cdot }{\|\cdot \|}$\\
 \\
-\textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. De plus, ces points critiques sont négligeables par rapport à la surface totale de l'objet. On évitera donc d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités.
+\textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. Cependant, ces points critiques sont négligeables par rapport à la surface totale de l'objet. On évitera d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités. Par exemple, on préférera utiliser un pavé très fin plutôt qu'un plan ayant deux dimensions.
 \subsubsection{Calcul de l'éclairage}
-On pose $SunDir \in \mathbb{R}^3$ la direction \textbf{normalisée} du soleil.
+On pose $LightPos \in \mathbb{R}^3$ la position d'une source de lumière et $LightColor$ sa couleur.
+\\La contribution de cette source de lumière à l'éclairement d'un objet blanc de normale $\Vec{N}$ au point $\mathbf{P}$ est donnée par ce calcul : 
+\begin{align*}
+    Contribution=max(\left\langle \Vec{N},\ normalize(Lightpos-P) \right\rangle,\ 0) \times LightColor
+\end{align*}
+Il suffit de sommer la contribution de chaque source i de lumière :
+\begin{align*}
+    Couleur\_Pixel=\sum_{i=1}^{n} max(\left\langle \Vec{N},\ normalize(Lightpos_i-P) \right\rangle,\ 0) \times LightColor_i
+\end{align*}
+Avec n le nombre de sources de lumière
+\textbf{Remarque} : Il n'est pas necessaire de gerer des problème de dépassement de couleur car le shader le fait lui-même.

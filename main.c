@@ -15,7 +15,7 @@ shaders/sierp.fs
 shaders/joliesformes.fs
 shaders/orthogonalView.fs
 */
-#define SCENE "shaders/default.fs"
+#define SCENE "shaders/immeublesparisiens.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -269,15 +269,17 @@ int main (){
   {
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
     // -------------------------------------------------------------------------------
-    glfwSwapBuffers(window);
+    
     glfwPollEvents();
 
     if (pause)
     {
-      glClearColor(.1f, .2f, 0.3f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
+      //glClearColor(.1f, .2f, 0.3f, 1.0f);
+      //glClear(GL_COLOR_BUFFER_BIT);
       continue;
     }
+
+    glfwSwapBuffers(window);
 
     pan=-mousePosX/180.;
 	  tilt=-mousePosY/180.;
