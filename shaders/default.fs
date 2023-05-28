@@ -155,9 +155,15 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),4.5); //deuxième value:couleur
-	                ///couleurs dispo (dans l'ordre 1,2,3,...) : Red,Green,Blue,Yellow,Magenta,Cyan,White
-    res=opu(res,vec2(SDF_Sphere(p,.2),1.6));
+    vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),mod(100*Time,360)); //deuxième value:couleur : valeur de hue entre 0 et 360
+	// Par exemple
+	// 000 : rouge
+	// 060 : jaune
+	// 120 : vert
+	// 180 : cyan
+	// 240 : bleu
+	// 300 : rose
+    res=opu(res,vec2(SDF_Sphere(p,.2),100));
 	return res;
 }
 
@@ -191,15 +197,23 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
 	
-	float id=impact.w;
+	// converting hsv to rgb
+
+	// may be we'll be able to modify them in the future
+	float value = 1.;
+	float sat = 1.;
+
+	float chroma = value * sat;
+	float hue = impact.w / 60;
+	float interm = chroma*(1-abs(mod(hue, 2) - 1));
+
 	vec3 couleur = vec3(1.);
-	     if (id<=1.0) couleur = vec3(1.,0.,0.)*id;
-	else if (id<=2.0) couleur = vec3(0.,1.,0.)*(id-1.);
-	else if (id<=3.0) couleur = vec3(0.,0.,1.)*(id-2.);
-	else if (id<=4.0) couleur = vec3(1.,1.,0.)*(id-3.);
-	else if (id<=5.0) couleur = vec3(1.,0.,1.)*(id-4.);
-	else if (id<=6.0) couleur = vec3(0.,1.,1.)*(id-5.);
-	else if (id<=7.0) couleur = vec3(1.,1.,1.)*(id-6.);
+	     if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
+	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
+	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
+	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
+	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	
 	return couleur*clamp(dot(sunPos,normale),0.,1.)*f;
 }

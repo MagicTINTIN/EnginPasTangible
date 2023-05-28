@@ -130,15 +130,23 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
 	
-	float id=impact.w;
+	// converting hsv to rgb
+
+	// may be we'll be able to modify them in the future
+	float value = 1.;
+	float sat = 1.;
+
+	float chroma = value * sat;
+	float hue = impact.w / 60;
+	float interm = chroma*(1-abs(mod(hue, 2) - 1));
+
 	vec3 couleur = vec3(1.);
-	     if (id<=1.0) couleur = vec3(1.,0.,0.)*id;
-	else if (id<=2.0) couleur = vec3(0.,1.,0.)*(id-1.);
-	else if (id<=3.0) couleur = vec3(0.,0.,1.)*(id-2.);
-	else if (id<=4.0) couleur = vec3(1.,1.,0.)*(id-3.);
-	else if (id<=5.0) couleur = vec3(1.,0.,1.)*(id-4.);
-	else if (id<=6.0) couleur = vec3(0.,1.,1.)*(id-5.);
-	else if (id<=7.0) couleur = vec3(1.,1.,1.)*(id-6.);
+	     if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
+	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
+	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
+	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
+	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	
 	return couleur*clamp(dot(sunPos,normale),0.,1.)*f; //*
 }
