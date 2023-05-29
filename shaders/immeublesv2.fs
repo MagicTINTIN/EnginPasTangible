@@ -13,11 +13,6 @@ in float OrthoView;
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
 
-float smin(float a, float b, float k){
-	float h=clamp(.5+.5*(b-a)/k,0.,1.0);
-	return mix(b,a,h) - k*h*(1.-h);
-}
-
 vec3 rotate(vec3 pos, vec3 angles){
 	float ca=cos(angles.x);
 	float sa=sin(angles.x);
@@ -30,14 +25,10 @@ vec3 rotate(vec3 pos, vec3 angles){
 							-sb*pos.x+sa*cb*pos.y+ca*cb*pos.z);
 }
 
-vec3 symetry(vec3 p, vec3 norm,float offset){
-	float d=dot(p,norm) + offset;
-	return (d>0)?p:p-2.*d*norm;
-}
-
 vec3 infinity(vec3 pos,vec3 box){
 	return mod(pos+.5*box,box)-.5*box;
 }
+
 
 vec3 repeat(vec3 p, vec3 size, vec3 repet)
 {
@@ -54,6 +45,17 @@ float SDF_Box_Frame( vec3 p, vec3 b, float e )
       length(max(vec3(q.x,q.y,p.z),0.0))+min(max(q.x,max(q.y,p.z)),0.0));
 }
 
+float SDF_Hex_Prism( vec3 p, vec2 h )
+{
+  const vec3 k = vec3(-0.8660254, 0.5, 0.57735);
+  p = abs(p);
+  p.xy -= 2.0*min(dot(k.xy, p.xy), 0.0)*k.xy;
+  vec2 d = vec2(
+       length(p.xy-vec2(clamp(p.x,-k.z*h.x,k.z*h.x), h.x))*sign(p.y-h.x),
+       p.z-h.y );
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
 float Inflate( float b, float r )
 {
   return b - r;
@@ -68,86 +70,66 @@ float SDF_Box(vec3 p, vec3 t){
 	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
 }
 
-float dot2(vec3 v){ return dot(v,v);}
-
-float SDF_Triangle( vec3 p, vec3 a, vec3 b, vec3 c )
+float SDF_Torus( vec3 p, vec2 t )
 {
-  vec3 ba = b - a; vec3 pa = p - a;
-  vec3 cb = c - b; vec3 pb = p - b;
-  vec3 ac = a - c; vec3 pc = p - c;
-  vec3 nor = cross( ba, ac );
-
-  return sqrt(
-    (sign(dot(cross(ba,nor),pa)) +
-     sign(dot(cross(cb,nor),pb)) +
-     sign(dot(cross(ac,nor),pc))<2.0)
-     ?
-     min( min(
-     dot2(ba*clamp(dot(ba,pa)/dot2(ba),0.0,1.0)-pa),
-     dot2(cb*clamp(dot(cb,pb)/dot2(cb),0.0,1.0)-pb) ),
-     dot2(ac*clamp(dot(ac,pc)/dot2(ac),0.0,1.0)-pc) )
-     :
-     dot(nor,pa)*dot(nor,pa)/dot2(nor) );
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
 }
 
-float SDF_tetra(vec3 p,float h){
-	//float hh = h*.5;
-	//float c1=h/sqrt(3);
-	//vec3 a = vec3(0.,hh,0.);
-	//vec3 b = vec3(0.,-hh,hh);
-	//vec3 c = vec3(c1,-hh,-hh);
-	//vec3 d = vec3(-c1,-hh,-hh);
-	float f1=1./sqrt(3.);
-	float f2=1./sqrt(6.);
-	vec3 a = vec3(0.);
-	vec3 o = vec3( 1.,-f1  ,-f2 );
-	vec3 b = vec3(-1.,-f1  ,-f2 )-o;
-	vec3 c = vec3(0. ,2.*f1,-f2 )-o;
-	vec3 d = vec3(0. ,0.  ,3.*f2)-o;
-	return min(SDF_Triangle(p,a,b,c),min(SDF_Triangle(p,a,b,d),min(SDF_Triangle(p,a,c,d),SDF_Triangle(p,b,c,d))));
+float SDF_DeathStar( in vec3 p2, in float ra, float rb, in float d )
+{
+  // sampling independent computations (only depend on shape)
+  float a = (ra*ra - rb*rb + d*d)/(2.0*d);
+  float b = sqrt(max(ra*ra-a*a,0.0));
+	
+  // sampling dependant computations
+  vec2 p = vec2( p2.x, length(p2.yz) );
+  if( p.x*b-p.y*a > d*max(b-p.y,0.0) )
+    return length(p-vec2(a,b));
+  else
+    return max( (length(p          )-ra),
+               -(length(p-vec2(d,0))-rb));
 }
 
-float SDF_tetra2(vec3 ps,float s){
-	vec3 p=ps+vec3(s);
-	return (max(
-	    abs(p.x+p.y)-p.z,
-	    abs(p.x-p.y)+p.z
-	)-s)/sqrt(3.);
+float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
+{
+  // sampling independent computations (only depend on shape)
+  float w = sqrt(r*r-h*h);
+  
+  // sampling dependant computations
+  vec2 q = vec2( length(p.xz), p.y );
+  return ((h*q.x<w*q.y) ? length(q-vec2(w,h)) : 
+                          abs(length(q)-r) ) - t;
 }
 
-float SDF_Sierp(vec3 p,float s,int n){
-	//float ss=s*.5;
-	//float c=s/sqrt(3);
-	//float c1=s/sqrt(3);
-	float d=pow(2.,n);
-	vec3 ps=p/s;
-	
-	for (int i=0;i<n;i++){
-		ps=symetry(ps,normalize(vec3(1,-1./sqrt(3.),-4./sqrt(6.))),d);
-		ps=symetry(ps,         (vec3(1.,0.,0.)),d);
-		ps=symetry(ps,normalize(vec3(1.,-3./sqrt(3.),0.)),d);
-		d*=.5;
-		
-	}
-	
-	return SDF_tetra(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
+float SDF_Cone(vec3 p, vec3 a, vec3 b, float ra, float rb)
+{
+    float rba  = rb-ra;
+    float baba = dot(b-a,b-a);
+    float papa = dot(p-a,p-a);
+    float paba = dot(p-a,b-a)/baba;
+
+    float x = sqrt( papa - paba*paba*baba );
+
+    float cax = max(0.0,x-((paba<0.5)?ra:rb));
+    float cay = abs(paba-0.5)-0.5;
+
+    float k = rba*rba + baba;
+    float f = clamp( (rba*(x-ra)+paba*baba)/k, 0.0, 1.0 );
+
+    float cbx = x-ra - f*rba;
+    float cby = paba - f;
+    
+    float s = (cbx < 0.0 && cay < 0.0) ? -1.0 : 1.0;
+    
+    return s*sqrt( min(cax*cax + cay*cay*baba,
+                       cbx*cbx + cby*cby*baba) );
 }
 
-float SDF_Sierp2(vec3 p,float s,int n){
-	//float ss=s*.5;
-	//float c=s/sqrt(3);
-	//float c1=s/sqrt(3);
-	float d=sqrt(2)*pow(2.,n)*s;
-	vec3 ps=p;// /s;
-	
-	for (int i=0;i<n;i++){
-		ps=symetry(ps,normalize(vec3(0.,1.,-1.)),0.);
-		ps=symetry(ps,normalize(vec3(-1.,1.,0.)),0.);
-		ps=symetry(ps,normalize(vec3(1.,0.,1.)),1.*d);
-		d*=.5	;
-	}
-	
-	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
+float SDF_Cylinder( vec3 p, float h, float r )
+{
+  vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
 vec2 opu(vec2 v1, vec2 v2){
@@ -155,19 +137,18 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),mod(100*Time,360)); //deuxième value:couleur : valeur de hue entre 0 et 360
-	// Par exemple
-	// 000 : rouge
-	// 060 : jaune
-	// 120 : vert
-	// 180 : cyan
-	// 240 : bleu
-	// 300 : rose
-	// 360 : noir
-	// 420 : white
-	// ajoutez 480 pour obtenir la même couleur mais avec de la réflexion
-    res=opu(res,vec2(SDF_Sphere(p,.2),480+420));
-	return res;
+    // immeuble
+    vec2 res = vec2(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),420);
+    // herbe
+    res = opu(res, vec2(SDF_Box(p,vec3(20.,0.1,50.)),120));
+    // route
+    res = opu(res, vec2(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),480+240));
+    res = opu(res, vec2(SDF_Box(p-vec3(12.,0.,0.),vec3(2.,0.1,50.)),480+240));
+    // lampadaire rgb
+    res = opu(res, vec2(SDF_Cone(p-vec3(17.,0.,-1.),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),480+390));
+    res = opu(res, vec2(SDF_Cylinder(p-vec3(17.,0.,-1.),4.,.2),480+390));
+    res = opu(res, vec2(SDF_Sphere(p-vec3(17.,4.,-1.),.5),mod(100*Time, 360)));
+    return res;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
@@ -191,10 +172,10 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	vec3 sunPos=vec3(0.,.7,.7);
-	//vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
+    vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
+	if(impact.w<0.) return skycolor+dotdirsun;
 	vec3 normale=grad(impact.xyz);
 	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
@@ -211,17 +192,15 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	float interm = chroma*(1-abs(mod(hue, 2) - 1));
 
 	vec3 couleur = vec3(1.);
-
-	if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+	     if (hue<=1.0) couleur = vec3(chroma,interm,0.);
 	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
 	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
 	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
-
-	// valeur de reflexion
-	float g=1.;
+	
+    float g=1.;
 
     if (hue > 8.) {
         hue-=8.;
@@ -236,7 +215,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	    g=reflexion.w<0.?1.5:1.;
     }
 
-	return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g;
+	return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f*g;
 }
 
 float Mandel(vec2 co){
@@ -268,7 +247,8 @@ void main(){
 	
 	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
-	if(OrthoView == 1.){
+	
+  if(OrthoView == 1.){
   //float c=Mandel(FragCoord*1.5);
   	FragColor=vec4(Get_Color(posCam+fovValue*FragCoord.x*normalize(Ex)+fovValue*FragCoord.y*normalize(Ey),normalize(Ez)),1.);//c,c,c,1.);
   }else{

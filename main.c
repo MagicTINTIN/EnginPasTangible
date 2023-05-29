@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.4.2)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.1)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -9,6 +9,7 @@
 #include "headers/shader.h"
 /* SCENE LIST 
 shaders/default.fs
+shaders/immeublesv2.fs
 shaders/immeublesparisiens.fs
 shaders/couleurs.fs
 shaders/sierp.fs
@@ -28,7 +29,7 @@ shaders/orthogonalView.fs
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 7
+#define DEBUG_MODE 1
 
 GLuint screenWidth = 720, screenHeight = 480;
 const GLFWvidmode* mode;

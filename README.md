@@ -61,3 +61,8 @@ Rotation autour du centre contrôlée par la souris (v0.2.5)
 
 ![Capture d'écran des premiers essais des ombres](./screenshots/EnginPasTangiblev0.4.2.gif)<br>
 Cycle jour nuit dans une scene avec des tours et déplacements clavier souris (v0.4.2)
+
+### V0.5.1
+
+![Capture d'écran d'une scène complexe avec plusieurs couleurs et des réflexions](./screenshots/EnginPasTangiblev0.5.1.gif)<br>
+Ajout des couleurs d'objets avec réflexions (v0.5.1)

@@ -16,9 +16,9 @@ Ainsi, on a $e_x$ et $e_y$ qui forment le plan de l'écran, et $e_z$ qui est dan
 \textbf{Remarque} : Cette base de vecteurs est orthonormée.
 
 \subsubsection{Création des vecteurs directeur pour chaque pixel}
-Pour chaque pixel de l'écran, on va associer un vecteur directeur. Ce vecteur est calculé avec $x$ et $y$ les coordonées du pixel et FOV le champ de vision $(x,y,FOV\in \mathbb{R})$: 
+Pour chaque pixel de l'écran, on va associer un vecteur directeur. Ce vecteur est calculé avec $x$ et $y$ les coordonées du pixel et FL la longueur focale $(x,y,FL\in \mathbb{R})$: 
 \begin{align*}
-    Direction &= normalize(x\times e_x + y\times e_y - FOV\times e_z)\\
+    Direction &= normalize(x\times e_x + y\times e_y - FL\times e_z)\\
 \end{align*}
 
 On obtient ainsi un vecteur directeur pour chaque pixel de l'écran.
