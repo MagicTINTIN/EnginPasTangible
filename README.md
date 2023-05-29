@@ -29,7 +29,7 @@ Pour pouvoir utiliser le moteur il vous suffit d'installer les librairies glfw.
 <br>
 Puis, Dans le repertoire de votre choix
 
-`git clone https://git.etud.insa-toulouse.fr/serviere/EnginPasTangible.git`<br>
+`git clone https://github.com/MagicTINTIN/EnginPasTangible.git`<br>
 `cd EnginPasTangible/`<br>
 `chmod +x run_linux.sh`
 
