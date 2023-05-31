@@ -83,12 +83,42 @@ float SDF_DeathStar( in vec3 p2, in float ra, float rb, in float d )
 
 vec3 Twister( in vec3 p )
 {
-    const float k = 2.0; // or some other amount
+    float k = .2*cos(Time); // or some other amount
     float c = cos(k*p.y);
     float s = sin(k*p.y);
-    mat2  m = mat2(c,-s,s,c);
-    vec3  q = vec3(m*p.xz,p.y);
+    //mat2  m = mat2(c,-s,s,c);
+    vec3  q = vec3(c*p.x-s*p.z,s*p.x+c*p.z,p.y);
     return q;
+}
+
+vec3 Bender( in vec3 p )
+{
+    //float k = 2.*cos(Time); // or some other amount
+    //float c = cos(k*p.x);
+    //float s = sin(k*p.x);
+    //mat2  m = mat2(c,-s,s,c);
+    //vec3  q = vec3(m*p.xy,p.z);
+	vec3 q = p;
+	q.y += .1*sin(2*p.x+5*Time);
+    return q;
+}
+
+
+vec3 Mer( in vec3 p )
+{
+    //float k = 2.*cos(Time); // or some other amount
+    //float c = cos(k*p.x);
+    //float s = sin(k*p.x);
+    //mat2  m = mat2(c,-s,s,c);
+    //vec3  q = vec3(m*p.xy,p.z);
+	vec3 q = p;
+	q.y += .1*sin(2*p.x+5*Time)*sin(1.5*p.y+4.5*Time);
+    return q + .02*sin(3*p.x+5*Time)*sin(4*p.y+3*Time)*sin(5*p.z+4*Time);;
+}
+
+vec3 Displacer (in vec3 p)
+{
+	return p + .02*sin(20*p.x+5*Time)*sin(20*p.y+3*Time)*sin(20*p.z+4*Time);
 }
 
 float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
@@ -107,18 +137,19 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Torus(Twister(p), vec2(1.,0.2)),1.0);
-    res = opu(res, vec2(SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.),2.));
-    return res;
+    vec2 res = vec2(SDF_Torus(Bender(Displacer(p)), vec2(1.,.2)),1.0);
+    res = opu(res, vec2(SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.),410.));
+    res = opu(res, vec2(SDF_Box(Mer(p+vec3(0,1,0)),vec3(10.,1,10.)),180.+480.));
+	return res;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
 	vec2 dist;
-	for(int i=0;i<260;i++){
+	for(int i=0;i<560;i++){
 		dist=SDF_Global(pos);
 		pos+=dist.x*dir;
-		if(dist.x<=.01) return vec4(pos,dist.y);
+		if(dist.x<=.001) return vec4(pos,dist.y);
 		if(dist.x>=200.0) return vec4(pos,-1.);
 	}
 	return vec4(pos,-1.);
@@ -160,7 +191,22 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
 	
-	return couleur*clamp(dot(sunPos,normale),0.,1.)*f; //*
+    float g=1.;
+
+    if (hue > 8.) {
+        hue-=8.;
+        if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+        else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
+        else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
+        else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
+        else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
+        else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
+        else if (hue<=7.0) couleur = vec3(interm,interm,interm);
+        vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+	    g=reflexion.w<0.?1.5:1.;
+    }
+
+	return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g; //*
 }
 
 float Mandel(vec2 co){

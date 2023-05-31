@@ -1,0 +1,51 @@
+
+un texte \footnote{avec un bas de page}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{graphics/organigramme.png}
+  \caption{desc de l'image}
+  \label{structure_capital}
+\end{figure}
+un autre texte
+
+\section{du code}
+
+\begin{minted}[linenos,frame=single]{js}
+var canvas = document.getElementById("Canvas");
+var ctx = canvas.getContext("2d");
+
+SetCamera(0, 0, 0)
+SetCameraAngle(5, 5, 5)
+SetDisplay(300, 300, 300)
+
+
+document.addEventListener("keydown",keyPush);
+setInterval(mainloop,1000/60);
+
+i=0
+function mainloop() {
+	i = i+1
+    ctx.fillStyle="white";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+\end{minted}
+
+\begin{code}
+    \begin{minted}[linenos,frame=single]{js}
+        //produit scalaire 
+        function dotProduct(u, v) {
+          return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+        }
+        
+        // produit vectoriel en dimension 3
+        function crossProduct(u, v) {
+          const x = u[1] * v[2] - u[2] * v[1];
+          const y = u[2] * v[0] - u[0] * v[2];
+          const z = u[0] * v[1] - u[1] * v[0];
+          return [x, y, z];
+        }
+    \end{minted}
+    \captionof{listing}{Exemple de fonctions que nous avons recodés}
+    
+    \label{code:crossproduct_and_dotproduct}
+\end{code}
