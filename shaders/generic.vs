@@ -13,6 +13,7 @@ out float fovValue;
 out float FacteurLargeur;
 out float OrthoView;
 out float CustomToggle;
+out float CustomInt;
 
 uniform float iTime;
 uniform vec3 iEx;
@@ -23,6 +24,7 @@ uniform float iFovValue;
 uniform float iFacteurLargeur;
 uniform int iOrthoView;
 uniform int iCustomToggle;
+uniform int iCustomInt;
 
 void main()
 {
@@ -37,4 +39,5 @@ void main()
    FacteurLargeur=iFacteurLargeur;
    OrthoView = iOrthoView;
    CustomToggle = iCustomToggle;
+   CustomInt = iCustomInt;
 }

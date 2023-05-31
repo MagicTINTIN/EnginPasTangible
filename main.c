@@ -19,8 +19,9 @@ shaders/orthogonalView.fs
 shaders/artefacts.fs
 shaders/laggyMandel.fs
 shaders/alancienne.fs
+shaders/evol.fs
 */
-#define SCENE "shaders/modifier.fs"
+#define SCENE "shaders/evol.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -34,7 +35,7 @@ shaders/alancienne.fs
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 1
+#define DEBUG_MODE 11
 
 GLuint screenWidth = 1.2*720, screenHeight = 1.2*480;
 const GLFWvidmode* mode;
@@ -69,6 +70,7 @@ bool forwardar = false;
 bool backwardar = false;
 int orthoView = 0;
 int customToggle = 0;
+int customInt = 0;
 
 float fovValue=1.0;
 //281=3.13/2 * 180
@@ -134,6 +136,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         printf("\n");
       }
     }
+    if (key == GLFW_KEY_N) {
+      customInt += 1 ;
+      if (DEBUG_MODE % 11 == 0) {
+        printf("Incrementing Custom Int\n");
+      }
+    }
+    if (key == GLFW_KEY_B) {
+      customInt -= 1 ;
+      if (DEBUG_MODE % 11 == 0) {
+        printf("Decrementing Custom Int\n");
+      }
+    }
+
     if (key == GLFW_KEY_BACKSPACE)
       glfwSetWindowShouldClose(window, GLFW_TRUE);
     if (key == GLFW_KEY_SPACE)
@@ -362,6 +377,7 @@ int main (){
 		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), (orthoView == 1) ? 2/(fovValue*fovValue*multiplicatorFov) : fovValue*fovValue*multiplicatorFov);
     glUniform1i(glGetUniformLocation(quad_shader, "iOrthoView"), orthoView);
     glUniform1i(glGetUniformLocation(quad_shader, "iCustomToggle"), customToggle);
+    glUniform1i(glGetUniformLocation(quad_shader, "iCustomInt"), customInt);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 
