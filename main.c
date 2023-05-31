@@ -16,7 +16,7 @@ shaders/sierp.fs
 shaders/joliesformes.fs
 shaders/orthogonalView.fs
 */
-#define SCENE "shaders/default.fs"
+#define SCENE "shaders/immeublesv2.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##

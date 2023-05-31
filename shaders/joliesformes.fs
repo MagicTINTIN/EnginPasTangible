@@ -80,6 +80,17 @@ float SDF_DeathStar( in vec3 p2, in float ra, float rb, in float d )
                -(length(p-vec2(d,0))-rb));
 }
 
+
+vec3 Twister( in vec3 p )
+{
+    const float k = 2.0; // or some other amount
+    float c = cos(k*p.y);
+    float s = sin(k*p.y);
+    mat2  m = mat2(c,-s,s,c);
+    vec3  q = vec3(m*p.xz,p.y);
+    return q;
+}
+
 float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
 {
   // sampling independent computations (only depend on shape)
@@ -96,7 +107,7 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Torus(p, vec2(1.,0.2)),1.0);
+    vec2 res = vec2(SDF_Torus(Twister(p), vec2(1.,0.2)),1.0);
     res = opu(res, vec2(SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.),2.));
     return res;
 }
