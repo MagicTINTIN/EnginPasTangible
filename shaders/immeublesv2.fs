@@ -174,7 +174,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
-    vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
+  vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
 	if(impact.w<0.) return skycolor+dotdirsun;
 	vec3 normale=grad(impact.xyz);
 	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;

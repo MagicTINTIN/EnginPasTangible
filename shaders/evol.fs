@@ -119,7 +119,7 @@ vec3 Mer( in vec3 p )
 
 vec3 Displacer (in vec3 p)
 {
-	return p + .02*sin(20*p.x+5*Time)*sin(20*p.y+3*Time)*sin(20*p.z+4*Time);
+	return p + .02*sin(2*p.x+5*Time)*sin(2*p.y+3*Time)*sin(2*p.z+4*Time);
 }
 
 float SDF_CutHollowSphere( vec3 p, float r, float h, float t )
@@ -149,10 +149,15 @@ vec2 opu(vec2 v1, vec2 v2){
 vec2 SDF_Global(vec3 p){
     float colorframe = 420;
     if (CustomInt >= 8) colorframe = mod(100*Time,360);
+
     vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),colorframe);
+    if (CustomInt >=10) res = vec2(SDF_Box_Frame(rotate(p,vec3(.4*Time,.5*Time,.6*Time)),vec3(1.),.1),colorframe);
     //vec2 res = vec2(SDF_Torus(Bender(Displacer(p-vec3(0.,.1,0.))), vec2(1.,.2)),1.0);
-    res = opu(res, vec2(SDF_Box(p+vec3(0,2,0),vec3(3.,.3,3.)),230.+480.));
-    res=opu(res,vec2(SDF_Sphere(p,.3),420));
+    if (CustomInt <= 10)
+        res = opu(res, vec2(SDF_Box(p+vec3(0,2,0),vec3(3.,.3,3.)),230.+480.));
+    else
+        res = opu(res, vec2(SDF_Box(Displacer(p)+vec3(0,2,0),vec3(3.,.3,3.)),230.+480.));
+    res=opu(res,vec2(SDF_Sphere(repeat(p-vec3(0,10.,0), vec3(4.,2.,10.), vec3(0, 5., 0.)),.3),420));
 	
 	return res;
 }
@@ -180,12 +185,14 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	vec3 sunPos=vec3(1.);
     if (CustomInt >= 2)
-        sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(1.4*cos(.4*Time),.6,0)));
+        sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(1.3*cos(.4*Time),.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
-
+    vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
     // changement du ciel
-	if(impact.w<0.) { 
+	if(impact.w<0.) {
+        if (CustomInt >= 9)
+            return skycolor+dotdirsun;
         if (CustomInt >= 6)
             return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;
         else if (CustomInt >= 3)
@@ -236,7 +243,8 @@ vec3 Get_Color(vec3 origin,vec3 dir){
     else if (CustomInt <= 3) return vec3(clamp(dot(sunPos,normale),0.,1.));
     else if (CustomInt <= 4) return vec3(clamp(dot(sunPos,normale),0.,1.))*f;// ombres
     else if (CustomInt <= 6) return vec3(clamp(dot(sunPos,normale),0.,1.))*f*g;// reflections
-    else if (CustomInt >= 7) return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g; // couleurs
+    else if (CustomInt <= 8) return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g; // couleurs
+    else if (CustomInt >= 9) return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f*g; // couleurs + ambiance
 }
 
 float Mandel(vec2 co){
