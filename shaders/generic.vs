@@ -12,6 +12,7 @@ out vec3 CamPos;
 out float fovValue;
 out float FacteurLargeur;
 out float OrthoView;
+out float CustomToggle;
 
 uniform float iTime;
 uniform vec3 iEx;
@@ -21,7 +22,7 @@ uniform vec3 iCamPos;
 uniform float iFovValue;
 uniform float iFacteurLargeur;
 uniform int iOrthoView;
-
+uniform int iCustomToggle;
 
 void main()
 {
@@ -35,4 +36,5 @@ void main()
    fovValue = iFovValue;
    FacteurLargeur=iFacteurLargeur;
    OrthoView = iOrthoView;
+   CustomToggle = iCustomToggle;
 }

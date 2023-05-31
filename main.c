@@ -11,22 +11,26 @@
 shaders/default.fs
 shaders/immeublesv2.fs
 shaders/immeublesparisiens.fs
-shaders/couleurs.fs
+shaders/smooth.fs
 shaders/sierp.fs
 shaders/tamer.fs
 shaders/modifier.fs
 shaders/orthogonalView.fs
+shaders/artefacts.fs
+shaders/laggyMandel.fs
+shaders/alancienne.fs
 */
-#define SCENE "shaders/tamer.fs"
+#define SCENE "shaders/modifier.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
- * 0 for all
- * 1 for nothing
- * 2 for FPS
- * 3 for cursor position
- * 5 for scroll level and precision
- * 7 for orthogonal information
+ *  0 for all
+ *  1 for nothing
+ *  2 for FPS
+ *  3 for cursor position
+ *  5 for scroll level and precision
+ *  7 for orthogonal information
+ * 11 for custom toggle information
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
@@ -64,6 +68,7 @@ bool rightar = false;
 bool forwardar = false;
 bool backwardar = false;
 int orthoView = 0;
+int customToggle = 0;
 
 float fovValue=1.0;
 //281=3.13/2 * 180
@@ -116,6 +121,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       if (DEBUG_MODE % 7 == 0) {
         printf("Orthogonal view : ");
         printf((orthoView == 1) ? "on" : "off");
+        printf("\n");
+      }
+    }
+
+    //custom toggle control
+    if (key == GLFW_KEY_C) {
+      customToggle = (customToggle + 1) % 2;
+      if (DEBUG_MODE % 11 == 0) {
+        printf("Custom toggle : ");
+        printf((customToggle == 1) ? "on" : "off");
         printf("\n");
       }
     }
@@ -346,6 +361,7 @@ int main (){
 		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
 		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), (orthoView == 1) ? 2/(fovValue*fovValue*multiplicatorFov) : fovValue*fovValue*multiplicatorFov);
     glUniform1i(glGetUniformLocation(quad_shader, "iOrthoView"), orthoView);
+    glUniform1i(glGetUniformLocation(quad_shader, "iCustomToggle"), customToggle);
     // glBindVertexArray(0); // no need to unbind it every time 
   }
 

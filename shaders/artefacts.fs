@@ -9,6 +9,7 @@ in vec3 CamPos;
 in float fovValue;
 in float FacteurLargeur;
 in float OrthoView;
+in float CustomToggle;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
@@ -90,7 +91,24 @@ float SDF_Triangle( vec3 p, vec3 a, vec3 b, vec3 c )
      dot(nor,pa)*dot(nor,pa)/dot2(nor) );
 }
 
-float SDF_tetra(vec3 ps,float s){
+float SDF_tetra(vec3 p,float h){
+	//float hh = h*.5;
+	//float c1=h/sqrt(3);
+	//vec3 a = vec3(0.,hh,0.);
+	//vec3 b = vec3(0.,-hh,hh);
+	//vec3 c = vec3(c1,-hh,-hh);
+	//vec3 d = vec3(-c1,-hh,-hh);
+	float f1=1./sqrt(3.);
+	float f2=1./sqrt(6.);
+	vec3 a = vec3(0.);
+	vec3 o = vec3( 1.,-f1  ,-f2 );
+	vec3 b = vec3(-1.,-f1  ,-f2 )-o;
+	vec3 c = vec3(0. ,2.*f1,-f2 )-o;
+	vec3 d = vec3(0. ,0.  ,3.*f2)-o;
+	return min(SDF_Triangle(p,a,b,c),min(SDF_Triangle(p,a,b,d),min(SDF_Triangle(p,a,c,d),SDF_Triangle(p,b,c,d))));
+}
+
+float SDF_tetra2(vec3 ps,float s){
 	vec3 p=ps+vec3(s);
 	return (max(
 	    abs(p.x+p.y)-p.z,
@@ -99,8 +117,29 @@ float SDF_tetra(vec3 ps,float s){
 }
 
 float SDF_Sierp(vec3 p,float s,int n){
+	//float ss=s*.5;
+	//float c=s/sqrt(3);
+	//float c1=s/sqrt(3);
+	float d=pow(2.,n);
+	vec3 ps=p/s;
+	
+	for (int i=0;i<n;i++){
+		ps=symetry(ps,normalize(vec3(1,-1./sqrt(3.),-4./sqrt(6.))),d);
+		ps=symetry(ps,         (vec3(1.,0.,0.)),d);
+		ps=symetry(ps,normalize(vec3(1.,-3./sqrt(3.),0.)),d);
+		d*=.5;
+		
+	}
+	
+	return SDF_tetra(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
+}
+
+float SDF_Sierp2(vec3 p,float s,int n){
+	//float ss=s*.5;
+	//float c=s/sqrt(3);
+	//float c1=s/sqrt(3);
 	float d=sqrt(2)*pow(2.,n)*s;
-	vec3 ps=p;
+	vec3 ps=p;// /s;
 	
 	for (int i=0;i<n;i++){
 		ps=symetry(ps,normalize(vec3(0.,1.,-1.)),0.);
@@ -109,44 +148,96 @@ float SDF_Sierp(vec3 p,float s,int n){
 		d*=.5	;
 	}
 	
-	return SDF_tetra(ps,s);
+	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
 }
 
-float SDF_Global(vec3 p){
-	return SDF_Sierp(p-vec3(1.),pow(2.,-6),7);
+vec2 opu(vec2 v1, vec2 v2){
+	return (v1.x<v2.x) ? v1 : v2;
+}
+
+vec2 SDF_Global(vec3 p){
+    vec2 res = vec2(SDF_Box(p,vec3(5,.2,5)),0); //deuxième value:couleur : valeur de hue entre 0 et 360
+	// Par exemple
+	// 000 : rouge
+	// 060 : jaune
+	// 120 : vert
+	// 180 : cyan
+	// 240 : bleu
+	// 300 : rose
+	// 360 : noir
+	// 420 : white
+	// ajoutez 480 pour obtenir la même couleur mais avec de la réflexion
+    res=opu(res,vec2(SDF_Sphere(p,2),420));
+	return res;
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	float dist;
-	for(int i=0;i<60;i++){
+	vec2 dist;
+	for(int i=0;i<((CustomToggle == 1) ? 50 : 260);i++){
 		dist=SDF_Global(pos);
-		pos+=dist*dir;
-		if(dist<=.001) return vec4(pos,1.);
-		if(dist>=20.0) return vec4(pos,-1.);
+		pos+=dist.x*dir;
+		if(dist.x<=.01) return vec4(pos,dist.y);
+		if(dist.x>=200.0) return vec4(pos,-1.);
 	}
 	return vec4(pos,-1.);
 }
 
 vec3 grad(vec3 p){
-	vec2 epsilon = vec2(.001,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy)-SDF_Global(p-epsilon.xyy),
-												SDF_Global(p+epsilon.yxy)-SDF_Global(p-epsilon.yxy),
-												SDF_Global(p+epsilon.yyx)-SDF_Global(p-epsilon.yyx)));
+	vec2 epsilon = vec2(.01,0.);
+	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
+												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
+												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);//(impact.y+1.)*.05*vec3(.5,.7,1.);
+	vec3 sunPos=vec3(0.,.7,.7);
+	//vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
+	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
+	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
 	vec3 normale=grad(impact.xyz);
-	//vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
-	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-	//float g=reflexion.w<0.?1.5:1.;
-	vec3 sunPos=vec3(0.,1,.2);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	float specular=0.;//clamp(dot(symetrique,sunPos)*.5,0.,1.);
+	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(dot(sunPos,normale),0.,1.))*f+vec3(specular);
+	
+	// converting hsv to rgb
+
+	// may be we'll be able to modify them in the future
+	float value = 1.;
+	float sat = 1.;
+
+	float chroma = value * sat;
+	float hue = impact.w / 60;
+	float interm = chroma*(1-abs(mod(hue, 2) - 1));
+
+	vec3 couleur = vec3(1.);
+
+	if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
+	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
+	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
+	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
+	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
+	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
+
+	// valeur de reflexion
+	float g=1.;
+
+    if (hue > 8.) {
+        hue-=8.;
+        if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+        else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
+        else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
+        else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
+        else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
+        else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
+        else if (hue<=7.0) couleur = vec3(interm,interm,interm);
+        vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+	    g=reflexion.w<0.?1.5:1.;
+    }
+
+	return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g;
 }
 
 float Mandel(vec2 co){
@@ -178,9 +269,7 @@ void main(){
 	
 	vec3 dir = normalize(FragCoord.x * normalize(Ex) + FragCoord.y * normalize(Ey) + fovValue * Ez);
 	
-	
-  //float c=Mandel(FragCoord*1.5);
-  if(OrthoView == 1.){
+	if(OrthoView == 1.){
   //float c=Mandel(FragCoord*1.5);
   	FragColor=vec4(Get_Color(posCam+fovValue*FragCoord.x*normalize(Ex)+fovValue*FragCoord.y*normalize(Ey),normalize(Ez)),1.);//c,c,c,1.);
   }else{

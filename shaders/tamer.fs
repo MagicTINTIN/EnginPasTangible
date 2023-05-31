@@ -185,7 +185,7 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(-1.+mod(.2*Time,2.),.6,0)));
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(cos(.2*Time),.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 	if(impact.w<0.) return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;
 	vec3 normale=grad(impact.xyz);
