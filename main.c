@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.1)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.3)"
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -13,10 +13,11 @@ shaders/immeublesv2.fs
 shaders/immeublesparisiens.fs
 shaders/couleurs.fs
 shaders/sierp.fs
-shaders/joliesformes.fs
+shaders/tamer.fs
+shaders/modifier.fs
 shaders/orthogonalView.fs
 */
-#define SCENE "shaders/joliesformes.fs"
+#define SCENE "shaders/tamer.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -31,7 +32,7 @@ shaders/orthogonalView.fs
  */
 #define DEBUG_MODE 1
 
-GLuint screenWidth = 720, screenHeight = 480;
+GLuint screenWidth = 1.2*720, screenHeight = 1.2*480;
 const GLFWvidmode* mode;
 GLFWwindow* window;
 

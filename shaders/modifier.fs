@@ -83,7 +83,7 @@ float SDF_DeathStar( in vec3 p2, in float ra, float rb, in float d )
 
 vec3 Twister( in vec3 p )
 {
-    float k = .2*cos(Time); // or some other amount
+    float k = 5*cos(Time); // or some other amount
     float c = cos(k*p.y);
     float s = sin(k*p.y);
     //mat2  m = mat2(c,-s,s,c);
@@ -112,7 +112,7 @@ vec3 Mer( in vec3 p )
     //mat2  m = mat2(c,-s,s,c);
     //vec3  q = vec3(m*p.xy,p.z);
 	vec3 q = p;
-	q.y += .1*sin(2*p.x+5*Time)*sin(1.5*p.y+4.5*Time);
+	q.y += .1*sin(2*p.x+5*Time)*sin(1.5*p.z	+4.5*Time);
     return q + .02*sin(3*p.x+5*Time)*sin(4*p.y+3*Time)*sin(5*p.z+4*Time);;
 }
 
@@ -137,9 +137,7 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Torus(Bender(Displacer(p)), vec2(1.,.2)),1.0);
-    res = opu(res, vec2(SDF_DeathStar(p-vec3(-5.,0,-5.), 3., 2., 4.),410.));
-    res = opu(res, vec2(SDF_Box(Mer(p+vec3(0,1,0)),vec3(10.,1,10.)),180.+480.));
+    vec2 res = vec2(SDF_Torus(Twister(p), vec2(1.,.2)),1.0);
 	return res;
 }
 
@@ -148,7 +146,7 @@ vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1
 	vec2 dist;
 	for(int i=0;i<560;i++){
 		dist=SDF_Global(pos);
-		pos+=dist.x*dir;
+		pos+=dist.x*dir*.25;
 		if(dist.x<=.001) return vec4(pos,dist.y);
 		if(dist.x>=200.0) return vec4(pos,-1.);
 	}
@@ -164,7 +162,7 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(-1+mod(.2*Time,2),.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 	if(impact.w<0.) return vec3(.4,.1+.6*sunPos.y,.8*sunPos.y)+dotdirsun;
 	vec3 normale=grad(impact.xyz);
