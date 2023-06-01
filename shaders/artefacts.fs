@@ -10,6 +10,7 @@ in float fovValue;
 in float FacteurLargeur;
 in float OrthoView;
 in float CustomToggle;
+in float CustomInt;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
@@ -174,7 +175,7 @@ vec2 SDF_Global(vec3 p){
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
 	vec2 dist;
-	for(int i=0;i<((CustomToggle == 1) ? 50 : 260);i++){
+	for(int i=0;i<((CustomToggle == 1) ? (50+10*CustomInt) : 260);i++){
 		dist=SDF_Global(pos);
 		pos+=dist.x*dir;
 		if(dist.x<=.01) return vec4(pos,dist.y);

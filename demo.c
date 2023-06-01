@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.3) - "
+#define APPNAMEVERSION "EnginPasTangible (demo 0.5.3) - "
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -24,7 +24,11 @@ shaders/evol.fs
 */
 //#define SCENE "shaders/loopMandel.fs"
 // Scenes order
-const char *scenes[] = {"shaders/default.fs","shaders/loopMandel.fs","shaders/evol.fs"};
+const char *scenes[] = {
+    "shaders/default.fs",
+    "shaders/loopMandel.fs",
+    "shaders/artefacts.fs",
+    "shaders/evol.fs"};
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -39,7 +43,7 @@ const char *scenes[] = {"shaders/default.fs","shaders/loopMandel.fs","shaders/ev
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 11*13
+#define DEBUG_MODE 13
 
 GLuint screenWidth = 1.2*720, screenHeight = 1.2*480;
 const GLFWvidmode* mode;
