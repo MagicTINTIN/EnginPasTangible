@@ -9,6 +9,8 @@ in vec3 CamPos;
 in float fovValue;
 in float FacteurLargeur;
 in float OrthoView;
+in float CustomToggle;
+in float CustomInt;
 
 out vec4 FragColor;
 //uniform sampler2D generalTexture;
@@ -138,15 +140,16 @@ vec2 opu(vec2 v1, vec2 v2){
 
 vec2 SDF_Global(vec3 p){
     // immeuble
-    vec2 res = vec2(SDF_Box_Frame(repeat(p, vec3(4.,2.,10.), vec3(2., 25., 4.)), vec3(1.,1.,1.),.1),420);
+    vec2 res = vec2(SDF_Box_Frame(repeat(p-vec3(0,21.0,0), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(1.,1.,1.),.1),420);
+    res = opu(res, vec2(SDF_Box(repeat(p-vec3(0,21.05,0.), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(.9)),180+480));
     // herbe
     res = opu(res, vec2(SDF_Box(p,vec3(20.,0.1,50.)),120));
     // route
-    res = opu(res, vec2(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),480+240));
-    res = opu(res, vec2(SDF_Box(p-vec3(12.,0.,0.),vec3(2.,0.1,50.)),480+240));
+    res = opu(res, vec2(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),240));
+    res = opu(res, vec2(SDF_Box(p-vec3(12.,0.,0.),vec3(2.,0.1,50.)),240));
     // lampadaire rgb
     res = opu(res, vec2(SDF_Cone(p-vec3(17.,0.,-1.),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),480+390));
-    res = opu(res, vec2(SDF_Cylinder(p-vec3(17.,0.,-1.),4.,.2),480+390));
+    res = opu(res, vec2(SDF_Cylinder(p-vec3(17.,2.,-1.),2.,.2),480+390));
     res = opu(res, vec2(SDF_Sphere(p-vec3(17.,4.,-1.),.5),mod(100*Time, 360)));
     return res;
 }
@@ -196,6 +199,8 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
 	
   vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.5+2*cos(.2*Time),.6,0)));
+  if (CustomToggle == 1)
+    sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(cos(.2*Time),.6,0)));
 
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
