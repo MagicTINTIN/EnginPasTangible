@@ -189,17 +189,7 @@ vec3 grad(vec3 p){
 												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
 }
 
-vec3 Get_Color(vec3 origin,vec3 dir){
-	vec4 impact = Get_Impact(origin,dir);
-	vec3 sunPos=vec3(0.,.7,.7);
-	//vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.2*Time,.6,0)));
-	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
-	vec3 normale=grad(impact.xyz);
-	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
-	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
-	float f=ombre.w<0.?1.:.5;
-	
+vec3 HSV(float c){
 	// converting hsv to rgb
 
 	// may be we'll be able to modify them in the future
@@ -207,36 +197,49 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	float sat = 1.;
 
 	float chroma = value * sat;
-	float hue = impact.w / 60;
+	float hue = mod(c / 60,8.0);
 	float interm = chroma*(1-abs(mod(hue, 2) - 1));
 
 	vec3 couleur = vec3(1.);
-
-	if (hue<=1.0) couleur = vec3(chroma,interm,0.);
+	     if (hue<=1.0) couleur = vec3(chroma,interm,0.);
 	else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
 	else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
 	else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
+	return couleur;
+}
 
-	// valeur de reflexion
-	float g=1.;
+vec3 Get_Color(vec3 origin,vec3 dir){
+	vec3 sunPos=vec3(0.,.7,0);
+	vec4 impact = Get_Impact(origin,dir);
+	
+	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
-    if (hue > 8.) {
-        hue-=8.;
-        if (hue<=1.0) couleur = vec3(chroma,interm,0.);
-        else if (hue<=2.0) couleur = vec3(interm,chroma,0.);
-        else if (hue<=3.0) couleur = vec3(0.,chroma,interm);
-        else if (hue<=4.0) couleur = vec3(0.,interm,chroma);
-        else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
-        else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
-        else if (hue<=7.0) couleur = vec3(interm,interm,interm);
-        vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-	    g=reflexion.w<0.?1.5:1.;
-    }
+  //vec3 skycolor = vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.); //
+  vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.8*sunPos.y,1.*sunPos.y);
 
-	return couleur*clamp(dot(sunPos,normale),0.,1.)*f*g;
+  // changement du ciel
+	if(impact.w<0.) {
+		return skycolor+dotdirsun;
+  	}
+	vec3 normale=grad(impact.xyz);
+	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
+	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
+	float f=ombre.w<0.?1.:.5;
+	vec3 couleur = HSV(impact.w);
+  	vec3 g=vec3(0.);
+  	if (impact.w/60 > 8.0){
+	
+  		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5*skycolor;
+		g*=clamp(dot(sunPos,grad(reflexion.xyz)),0.,1.);
+	
+	}
+    
+    return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // better reflections
+	
 }
 
 float Mandel(vec2 co){

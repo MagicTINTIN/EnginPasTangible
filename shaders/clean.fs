@@ -4,7 +4,7 @@
 
 
 // Penser à incrémenter cette valeur
-// Dernière étape du moteur CustomInt = 11 (donc une nouvelle modification est égale à +1)
+// Dernière étape du moteur CustomInt = 12 (donc une nouvelle modification est égale à +1)
 
 
 
@@ -168,19 +168,29 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
 	vec3 couleur = HSV(impact.w);
-  vec3 g=vec3(0.);
+  	vec3 g=vec3(0.);
+	float oldg=1.;
   if (impact.w/60 > 8.0){
-  	vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5;
+	if (CustomInt >= 12){
+		
+  		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5*skycolor;
 		g*=clamp(dot(sunPos,grad(reflexion.xyz)),0.,1.);
+		
+	} else {
+		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
+	    oldg=reflexion.w<0.?1.5:1.;
+		}
 	}
     
     if (CustomInt <= 0) return normale;
     else if (CustomInt <= 3) return vec3(clamp(dot(sunPos,normale),0.,1.));
     else if (CustomInt <= 4) return vec3(clamp(dot(sunPos,normale),0.,1.))*f;// ombres
-    else if (CustomInt <= 6) return vec3(clamp(dot(sunPos,normale),0.,1.))*f+g;// reflections
-    else if (CustomInt <= 8) return couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // couleurs
-    else if (CustomInt >= 9) return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // couleurs + ambiance
+    else if (CustomInt <= 6) return vec3(clamp(dot(sunPos,normale),0.,1.))*f*oldg;// reflections
+    else if (CustomInt <= 8) return couleur*clamp(dot(sunPos,normale),0.,1.)*f*oldg; // couleurs
+    else if (CustomInt <= 11) return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f*oldg; // couleurs + ambiance
+	else if (CustomInt >= 12) return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // better reflections
+	
 }
 
 float Mandel(vec2 co){
