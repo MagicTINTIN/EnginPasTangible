@@ -1,5 +1,14 @@
 #version 330 core
+///////////////////////---------------///////////////////////
 
+
+
+// Penser à incrémenter cette valeur
+// Dernière étape du moteur CustomInt = 11 (donc une nouvelle modification est égale à +1)
+
+
+
+///////////////////////---------------///////////////////////
 in vec2 FragCoord;
 in float Time;
 in vec3 Ex;
