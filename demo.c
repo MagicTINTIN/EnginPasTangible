@@ -24,7 +24,7 @@ shaders/evol.fs
 */
 #define SCENE "shaders/loopMandel.fs"
 // Scenes order
-const char *strings[] = {"shaders/default.fs","shaders/laggyMandel.fs","shaders/evol.fs"};
+const char *scenes[] = {"shaders/default.fs","shaders/loopMandel.fs","shaders/evol.fs"};
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -35,10 +35,11 @@ const char *strings[] = {"shaders/default.fs","shaders/laggyMandel.fs","shaders/
  *  5 for scroll level and precision
  *  7 for orthogonal information
  * 11 for custom toggle information
+ * 13 for scene changing
  * 
  * For instance if you want fps and position set the value to 2*3=6
  */
-#define DEBUG_MODE 11
+#define DEBUG_MODE 11*13
 
 GLuint screenWidth = 1.2*720, screenHeight = 1.2*480;
 const GLFWvidmode* mode;
@@ -74,6 +75,10 @@ bool backwardar = false;
 int orthoView = 0;
 int customToggle = 0;
 int customInt = 0;
+
+int sceneNumber = 0;
+int compilerInfo;
+GLuint quad_shader;
 
 float fovValue=1.0;
 //281=3.13/2 * 180
@@ -150,6 +155,39 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       if (DEBUG_MODE % 11 == 0) {
         printf("Decrementing Custom Int\n");
       }
+    }
+
+    if (key == GLFW_KEY_J) {
+        if ((sceneNumber + 1) < (sizeof(scenes) / sizeof(* scenes))) 
+        {
+            sceneNumber += 1 ;
+            quad_shader = glCreateProgram();
+            compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", scenes[sceneNumber]);
+            if(compilerInfo>0){
+                //return compilerInfo;
+                return;
+            }
+            glUseProgram(quad_shader);
+            if (DEBUG_MODE % 13 == 0) {
+                printf("Next Scene\n");
+            }
+        }
+    }
+    if (key == GLFW_KEY_F) {
+        if (sceneNumber > 0)
+        {
+            sceneNumber -= 1;
+            quad_shader = glCreateProgram();
+            compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", scenes[sceneNumber]);
+            if(compilerInfo>0){
+                //return compilerInfo;
+                return;
+            }
+            glUseProgram(quad_shader);
+            if (DEBUG_MODE % 13 == 0) {
+                printf("Previous Scene\n");
+            }
+        }
     }
 
     if (key == GLFW_KEY_BACKSPACE)
@@ -274,8 +312,8 @@ int main (){
   setupVAO();
   glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to unbind in the setupVertexArray function and then bind here, but we'll do so for clarity, organization, and avoiding possible bugs in future
     
-  GLuint quad_shader = glCreateProgram();
-  int compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", SCENE);
+  quad_shader = glCreateProgram();
+  compilerInfo=buildShaders(quad_shader, "shaders/generic.vs", scenes[sceneNumber]);
   if(compilerInfo>0){
   	return compilerInfo;
   }
@@ -288,7 +326,7 @@ int main (){
   //glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glfwSetKeyCallback(window, key_callback);
- 	glfwSetCursorPosCallback(window, cursor_position_callback);
+  glfwSetCursorPosCallback(window, cursor_position_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetScrollCallback(window, scroll_callback);
 
