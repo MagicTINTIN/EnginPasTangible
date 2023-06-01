@@ -1,19 +1,4 @@
 \newpage
-\subsubsection{Calcul de la couleur de l'objet}
-
-La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés. La valeur correspond à la teinte de l'objet. Comme montré sur le schéma ci-dessous une valeur à 180 degrés (donc au milieu) correspondrait à du cyan.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=8cm]{images/huetorgb.jpg}
-    \caption{Décomposition de la couleur }
-    \label{fig:huetorb}
-\end{figure}
-
-On remarque que l'on peut facilement calculer les valeurs de rouge de vert et de bleu (comprises entre 0 et 1) nécessaires à l'obtention de la coueleur souhaitée.\\
-En effet, il suffit de découper la courbe tous les 60 degrés et on obtient des courbes constantes ou linaires.\\
-Pour reprendre l'exemple du cyan, en se plaçant à 180 degré on remarque que le rouge vaut 0 et que le bleu et le vert valent 1.
-
 \subsection{Calcul de la couleur à afficher}
 \subsubsection{Calcul de normale}
 Pour les calculs de couleurs, on va avoir besoin de la normale $\Vec{N}$ de la surface de l'objet "rencontré" par le rayon.
@@ -29,9 +14,27 @@ On pose $LightPos \in \mathbb{R}^3$ la position d'une source de lumière et $Lig
 \begin{align*}
     Contribution=max(\left\langle \Vec{N},\ normalize(Lightpos-P) \right\rangle,\ 0) \times LightColor
 \end{align*}
-Il suffit de sommer la contribution de chaque source i de lumière :
+
+S'il y a $n$ sources, il suffit de sommer la contribution de chaque source i de lumière:
 \begin{align*}
-    Couleur\_Pixel=\sum_{i=1}^{n} max(\left\langle \Vec{N},\ normalize(Lightpos_i-P) \right\rangle,\ 0) \times LightColor_i
+    Couleur\_Eclairage=\sum_{i=1}^{n} max(\left\langle \Vec{N},\ normalize(Lightpos_i-P) \right\rangle,\ 0) \times LightColor_i
 \end{align*}
-Avec n le nombre de sources de lumière
+\\
 \textbf{Remarque} : Il n'est pas necessaire de gerer des problème de dépassement de couleur car le shader le fait lui-même.
+
+\newpage
+\subsubsection{Calcul de la couleur de l'objet}
+
+La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés. La valeur correspond à la teinte de l'objet. Comme montré sur le schéma ci-dessous une valeur à 180 degrés (donc au milieu) correspondrait à du cyan.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=8cm]{images/huetorgb.jpg}
+    \caption{Décomposition de la couleur }\label{fig:huetorb}
+\end{figure}
+
+On remarque que l'on peut facilement calculer les valeurs de rouge, de vert et de bleu (comprises entre 0 et 1) nécessaires à l'obtention de la coueleur souhaitée.\\
+En effet, il suffit de découper la courbe tous les 60 degrés et on obtient des courbes constantes ou linaires.\\
+Pour reprendre l'exemple du cyan, en se plaçant à 180 degré on remarque que le rouge vaut 0 et que le bleu et le vert valent 1.
+\subsection{Calcul des ombres}
+Pour determiner s'il y a une ombre à un point $P$, il suffit de projeter un rayon d'origine $P$ et de direction $Sun\_Direction$ de la même manière que dans la partie \ref{subsec:projection} \nameref{subsec:projection}. Si le rayon projetté converge, alors il a rencontré un obstacle et il y a une ombre. Sinon, il n'y a pas d'ombre.
