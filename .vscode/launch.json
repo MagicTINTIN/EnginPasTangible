@@ -9,6 +9,12 @@
             "name": "Debug",
             "request": "launch",
             "type": "node-terminal"
+        },
+        {
+            "command": "${workspaceFolder}/run_linux.sh ${workspaceFolder}/demo.c",
+            "name": "Demo",
+            "request": "launch",
+            "type": "node-terminal"
         }
     ]
 }

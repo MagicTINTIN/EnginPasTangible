@@ -22,7 +22,9 @@ shaders/loopMandel.fs
 shaders/alancienne.fs
 shaders/evol.fs
 */
-#define SCENE "shaders/evol.fs"
+#define SCENE "shaders/loopMandel.fs"
+// Scenes order
+const char *strings[] = {"shaders/default.fs","shaders/laggyMandel.fs","shaders/evol.fs"};
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
@@ -371,11 +373,13 @@ int main (){
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glUniform1f(glGetUniformLocation(quad_shader, "iTime"), currentTime-startTime);
-		glUniform3f(glGetUniformLocation(quad_shader, "iEx"), ex[0],ex[1],ex[2]);
+    // if ((int)(currentTime-startTime) % 100000 == 0)
+    //     printf("temps : %s\n", (int)currentTime-startTime);
+	glUniform3f(glGetUniformLocation(quad_shader, "iEx"), ex[0],ex[1],ex[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEy"), ey[0],ey[1],ey[2]);
     glUniform3f(glGetUniformLocation(quad_shader, "iEz"), ez[0],ez[1],ez[2]);
-		glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
-		glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), (orthoView == 1) ? 2/(fovValue*fovValue*multiplicatorFov) : fovValue*fovValue*multiplicatorFov);
+	glUniform3f(glGetUniformLocation(quad_shader, "iCamPos"), camPosX,camPosY,camPosZ);
+	glUniform1f(glGetUniformLocation(quad_shader, "iFovValue"), (orthoView == 1) ? 2/(fovValue*fovValue*multiplicatorFov) : fovValue*fovValue*multiplicatorFov);
     glUniform1i(glGetUniformLocation(quad_shader, "iOrthoView"), orthoView);
     glUniform1i(glGetUniformLocation(quad_shader, "iCustomToggle"), customToggle);
     glUniform1i(glGetUniformLocation(quad_shader, "iCustomInt"), customInt);
