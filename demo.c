@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.3)"
+#define APPNAMEVERSION "EnginPasTangible (alpha 0.5.3) - "
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>
@@ -22,7 +22,7 @@ shaders/loopMandel.fs
 shaders/alancienne.fs
 shaders/evol.fs
 */
-#define SCENE "shaders/loopMandel.fs"
+//#define SCENE "shaders/loopMandel.fs"
 // Scenes order
 const char *scenes[] = {"shaders/default.fs","shaders/loopMandel.fs","shaders/evol.fs"};
 #define FULLSCREEN 0
@@ -96,6 +96,21 @@ float camPrecision = 2.;
   return cross_P;
 }*/
 
+char* concat(const char *s1, const char *s2)
+{
+    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    // in real code you would check for errors in malloc here
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}
+
+static void updatingTitleName(GLFWwindow* window) {
+    char* sname = concat(APPNAMEVERSION,scenes[sceneNumber]);
+    glfwSetWindowTitle(window, sname);
+    free(sname);
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   int stateShift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
@@ -117,13 +132,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       printf(pause ? "En pause\n" : "En fonctionnement\n");
       if (pause)
       {
-        glfwSetWindowTitle(window, "EnginPasTangible (En pause)");
+        char* sname = concat("EnginPasTangible (En pause) - ",scenes[sceneNumber]);
+        glfwSetWindowTitle(window, sname);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        free(sname);
       }
       else
       {
-        glfwSetWindowTitle(window, APPNAMEVERSION);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        updatingTitleName(window);
       }
     }
     if (key == GLFW_KEY_TAB) {
@@ -168,6 +185,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 return;
             }
             glUseProgram(quad_shader);
+            updatingTitleName(window);
             if (DEBUG_MODE % 13 == 0) {
                 printf("Next Scene\n");
             }
@@ -184,6 +202,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 return;
             }
             glUseProgram(quad_shader);
+            updatingTitleName(window);
             if (DEBUG_MODE % 13 == 0) {
                 printf("Previous Scene\n");
             }
@@ -289,7 +308,9 @@ int main (){
 	//glfwWindowHint(GLFW_DECORATED,GL_FALSE);
 	//glfwWindowHint(GLFW_CONTEXT_NO_ERROR,GL_FALSE);
   pause = false;
-  window = glfwCreateWindow(screenWidth, screenHeight, APPNAMEVERSION, NULL, NULL);
+  char* sname = concat(APPNAMEVERSION,scenes[sceneNumber]);
+  window = glfwCreateWindow(screenWidth, screenHeight, sname, NULL, NULL);
+  free(sname);
     
   if (window == NULL)
   {
