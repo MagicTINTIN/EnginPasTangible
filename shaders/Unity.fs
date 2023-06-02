@@ -155,7 +155,7 @@ vec2 opu(vec2 v1, vec2 v2){
 }
 
 vec2 SDF_Global(vec3 p){
-    return vec2(SDF_Box_Frame(rotate(symetry(p,vec3(1.,0.,0.),0.),vec3(Time*.3,Time*.6,Time*.9)),vec3(2.),.3),420);
+    return vec2(SDF_Box_Frame(rotate(symetry(p,vec3(1.,0.,0.),1.3),vec3(Time*.3,Time*.6,Time*.9)),vec3(2.),.3),420);
 }
 
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
