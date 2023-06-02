@@ -6,7 +6,7 @@
 %\usepackage[french]{babel}
 
 % resolve no citation problem
-%\nocite{*}
+\nocite{*}
 %\usepackage[...,backend=bibtex]{biblatex}
 
 % Set page size and margins
@@ -21,6 +21,10 @@
 \lstset{language=GLSL}
 \input{preferences/glsl.tex}
 
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{abbrvnat}
+%Includes "References" in the table of contents
+\usepackage[nottoc]{tocbibind}
 
 \usepackage{setspace}
 \usepackage{titletoc}
@@ -35,6 +39,7 @@
 
 
 \begin{document}
+\dosecttoc{} % generate TOC
 %\maketitle
 \cleardoublepage
 
@@ -66,38 +71,32 @@ Avant de commencer ce rapport, nous tenions à remercier M. Sanchez, notre encad
 
 \clearpage
 
-%\addcontentsline{toc}{section}{Bibliography}
-%\printbibliography
 
-\sectionnn{Bibliographie}
-Une biblio
+%Imports the bibliography file "sample.bib"
+\bibliography{sample}
 \clearpage
 
 % TABLE DES ANNEXES
 \clearpage
 \appendix
-%\thispagestyle{empty} % removes page number
+\thispagestyle{empty} % removes page number
 \sectionnn{Table des Annexes}
 \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
 \renewcommand{\stctitle}{}                          % Titre (issue with previous subsection showing up)
-
+\renewcommand\thesubsection{A\arabic{subsection}}   % Numérotation
 \renewcommand{\stcSSfont}{}                         % Police normale, pas en gras
 \mtcsetrules{secttoc}{off}                          % Désactivation des lignes en haut et en bas de la table
-\clearpage
 
 % Affichage de la table des annexes
 \secttoc
-
 % ANNEXES
 \clearpage
 \pagenumbering{Roman}
 
-\renewcommand\thesubsection{A\arabic{subsection}}   % Numérotation
-\include{Parties/Annexes}
 
+\input{Parties/Annexes}
 
 \mtcsetrules{secttoc}{off}
-
 
 \end{document}
 
