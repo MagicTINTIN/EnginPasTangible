@@ -34,7 +34,7 @@ La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés
 \end{figure}
 
 On remarque que l'on peut facilement calculer les valeurs de rouge, de vert et de bleu (comprises entre 0 et 1) nécessaires à l'obtention de la coueleur souhaitée.\\
-En effet, il suffit de découper la courbe tous les 60 degrés et on obtient des courbes constantes ou linaires.\\
-Pour reprendre l'exemple du cyan, en se plaçant à 180 degré on remarque que le rouge vaut 0 et que le bleu et le vert valent 1.
+En effet, il suffit de découper la courbe tous les 60 degrés et on obtient des courbes constantes ou linéaires.\\
+Pour reprendre l'exemple du cyan, en se plaçant à 180 degrés on remarque que le rouge vaut 0 et que le bleu et le vert valent 1.
 \subsection{Calcul des ombres}
 Pour determiner s'il y a une ombre à un point $P$, il suffit de projeter un rayon d'origine $P$ et de direction $Sun\_Direction$ de la même manière que dans la partie \ref{subsec:projection} \nameref{subsec:projection}. Si le rayon projetté converge, alors il a rencontré un obstacle et il y a une ombre. Sinon, il n'y a pas d'ombre.
