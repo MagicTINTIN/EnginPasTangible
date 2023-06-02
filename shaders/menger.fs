@@ -74,9 +74,10 @@ float SDF_Cross(vec3 p )
 }
 
 float SDF_Global(vec3 p){
-   float d = SDF_Box(p,vec3(1.0));
+   float size=3.0;
+   float d = SDF_Box(p,vec3(size));
 
-   float s = 1.0;
+   float s = 1.0/size;
    for( int m=0; m<5; m++ )
    {
       vec3 a = mod( p*s, 2.0 )-1.0;
@@ -103,7 +104,7 @@ vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1
 }
 
 vec3 grad(vec3 p){
-	vec2 epsilon = vec2(.01,0.);
+	vec2 epsilon = vec2(.001,0.);
 	return normalize(vec3(SDF_Global(p+epsilon.xyy)-SDF_Global(p-epsilon.xyy),
 												SDF_Global(p+epsilon.yxy)-SDF_Global(p-epsilon.yxy),
 												SDF_Global(p+epsilon.yyx)-SDF_Global(p-epsilon.yyx)));
@@ -111,15 +112,12 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);//(impact.y+1.)*.05*vec3(.5,.7,1.);
+	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
 	vec3 normale=grad(impact.xyz);
-	//vec3 symetrique= dir-2.0*dot(dir,normale)*normale;
-	//vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-	//float g=reflexion.w<0.?1.5:1.;
-	vec3 sunPos=vec3(0.,.7,.7);//vec3(3.,3.5,.5);//vec3(3.*sin(Time*1.5),3.*cos(Time*3.),3.*cos(Time*1.5));
-	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
+	vec3 sunPos=normalize(vec3(1.,2.,3.));
+	vec4 ombre = Get_Impact(impact.xyz+0.002*normale,sunPos);
 	float f=ombre.w<0.?1.:.5;
-	return vec3(clamp(dot(sunPos,normale),0.,1.))*f;
+	return vec3(clamp(dot(sunPos,normale),0.,1.)*f);
 }
 
 float Mandel(vec2 co){
