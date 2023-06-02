@@ -22,7 +22,7 @@ shaders/loopMandel.fs
 shaders/alancienne.fs
 shaders/evol.fs
 */
-#define SCENE "shaders/immeublesv2.fs"
+#define SCENE "shaders/Unity.fs"
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
