@@ -15,7 +15,15 @@
 
 % Useful packages
 \usepackage{listings}
+
+\input{preferences/listings-glsl.prf}
+% optionally set GLSL as default language
+\lstset{language=GLSL}
+\input{preferences/glsl.tex}
+
+
 \usepackage{setspace}
+\usepackage{titletoc}
 %\usepackage[T1]{fontenc}
 %\usepackage{amsfonts}
 %\usepackage{graphicx}
@@ -28,8 +36,22 @@
 
 \begin{document}
 %\maketitle
+\cleardoublepage
+
+
+% Remerciements
+\thispagestyle{empty} % removes page number
+\subsection*{Remerciements}
+Avant de commencer ce rapport, nous tenions à remercier M. Sanchez, notre encadrant dans le cadre de ce projet.
 \clearpage
 
+% TABLE DES MATIÈRES
+\thispagestyle{empty} % removes page number
+\setcounter{secnumdepth}{3}
+\tableofcontents
+\clearpage
+
+\setcounter{page}{1}
 
 
 \input{Parties/Introduction}
@@ -44,8 +66,40 @@
 
 \clearpage
 
+%\addcontentsline{toc}{section}{Bibliography}
+%\printbibliography
+
+\sectionnn{Bibliographie}
+Une biblio
+\clearpage
+
+% TABLE DES ANNEXES
+\clearpage
+\appendix
+%\thispagestyle{empty} % removes page number
+\sectionnn{Table des Annexes}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+\renewcommand{\stctitle}{}                          % Titre (issue with previous subsection showing up)
+
+\renewcommand{\stcSSfont}{}                         % Police normale, pas en gras
+\mtcsetrules{secttoc}{off}                          % Désactivation des lignes en haut et en bas de la table
+\clearpage
+
+% Affichage de la table des annexes
+\secttoc
+
+% ANNEXES
+\clearpage
+\pagenumbering{Roman}
+
+\renewcommand\thesubsection{A\arabic{subsection}}   % Numérotation
+\include{Parties/Annexes}
+
+
+\mtcsetrules{secttoc}{off}
+
+
 \end{document}
 
-\bibliographystyle{alpha}
-\bibliography{sample}
 
+                        
