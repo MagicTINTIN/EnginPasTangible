@@ -4,11 +4,11 @@
 %%\nameref{Projection des rayons}
 Pour projeter un rayon, on le fait avancer pas à pas. La distance des pas doit être la plus grande possible, mais sans que le rayon ne traverse d'objet de la scene 3D.\\
 \\
-Afin de projeter les rayons partant du point $Origine_Camera\in \mathbb{R}^3$ et de direction $Direction\in \mathbb{R}^3$, on utilise la suite suivante:
+Afin de projeter les rayons partant du point $Origine\_Camera\in \mathbb{R}^3$ et de direction $Direction\in \mathbb{R}^3$, on utilise la suite suivante:
 $$
 (Pos_n)_{n\in \mathbb{N}}=\left\{
     \begin{array}{ll}
-        Pos_0 &= Origine \\
+        Pos_0 &= Origine\_Camera \\
         Pos_{n+1} &= Pos_n + SDF\_Scene(Pos_n)\times Direction \ \ \mathbf{\forall n\in \mathbb{N}}
     \end{array}
 \right.
