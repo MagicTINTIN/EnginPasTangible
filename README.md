@@ -7,30 +7,13 @@ Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 ![Logo d'EnginPasTangible](./assets/icon.png)
 
 ---
-⚠️ Le projet est en cours de création, il peut y avoir des bugs. ⚠️
+⚠️ Le projet est toujours en cours de développement, il peut y avoir des bugs. ⚠️
 
 ---
 ## Images issues d'EnginPasTangible
 
-### V0.2.2
-
-![Capture d'écran de la toute première version](./screenshots/v0.2.2.png)<br>
-Capture d'écran de la toute première version d'EnginPasTangible (v0.2.2)
-
-### V0.2.5
-
-![Capture d'écran de la première version avec une source lumineuse](./screenshots/EnginPasTangiblev0.2.5.gif)<br>
-Rotation autour du centre contrôlée par la souris (v0.2.5)
-
-### V0.4.2
-
-![Capture d'écran des premiers essais des ombres](./screenshots/EnginPasTangiblev0.4.2.gif)<br>
-Cycle jour nuit dans une scene avec des tours et déplacements clavier souris (v0.4.2)
-
-### V0.5.1
-
-![Capture d'écran d'une scène complexe avec plusieurs couleurs et des réflexions](./screenshots/EnginPasTangiblev0.5.1.gif)<br>
-Ajout des couleurs d'objets avec réflexions (v0.5.1)
+![Evolution du moteur graphique](./screenshots/evolutionEPT.gif)<br>
+Evolution du moteur graphique (première version à la v1.0.0)
 
 ---
 ## Contrôles
@@ -58,7 +41,7 @@ Fermer la fenêtre : <kbd>Backspace</kbd><br>
 Ces commandes peuvent être utilisées dans certaines scènes uniquement
 Activer/Désactiver : <kbd>C</kbd> (dans artefacts.fs)<br>
 Incrémenter/Décrémenter : <kbd>B</kbd>/<kbd>N</kbd> (dans evol.fs)<br>
-<b>Uniquement dans demo</b> : scène précédente/suivante : <kbd>F</kbd>/<kbd>J</kbd>
+<b>Uniquement dans demo et le programme principal</b> : scène précédente/suivante : <kbd>F</kbd>/<kbd>J</kbd>
 
 ---
 
@@ -78,13 +61,19 @@ Pour pouvoir utiliser le moteur il vous suffit d'installer les librairies glfw.
 
 
 <br>
-Puis, Dans le repertoire de votre choix
+Puis, dans le repertoire de votre choix
 
 `git clone https://github.com/MagicTINTIN/EnginPasTangible.git`<br>
 `cd EnginPasTangible/`<br>
 `chmod +x run_linux.sh`
 
-Pour compiler et exécuter le programme utilisez `./run_linux main.c`
+Pour compiler EnginPasTangible, executez `./compileEPT.sh EnginPasTangible.c`
+
+Une fois votre programme compilé, vous pouvez exécuter `./ept chemin/vers/un/fichier.fs`<br>
+*(plusieurs fichiers sont disponibles dans shaders/)*<br>
+Vous pouvez importer plusieurs fichiers .fs (max 100), pour changer de scène il vous suffit d'appuyer sur les touches <kbd>F</kbd> ou <kbd>J</kbd>
+
+*Pour compiler et exécuter le programme en version debug utilisez `./run_linux main.c`*
 <br><br>
 Utilisez `git pull origin master` pour mettre à jour votre version du moteur graphique
 <br><br>
