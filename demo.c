@@ -28,7 +28,8 @@ const char *scenes[] = {
     "shaders/default.fs",
     "shaders/loopMandel.fs",
     "shaders/artefacts.fs",
-    "shaders/evol.fs"};
+    "shaders/evol.fs"
+    "shaders/"};
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
