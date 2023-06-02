@@ -1,21 +1,25 @@
 \subsection{Volumes élémentaires}
-Dans cette partie, on s'interresse aux fonctions SDF (Signed Distance Function) de differentes formes géométriques. On remarque que toutes ces fonctions supposent que l'objet géometrique est centré en $O$. Cela simplifie beaucoup les fontions et il est très facile de leur appliquer une translation ou autre transformation, comme indiqué dans \ref{subsec:Transformations}.
+Dans cette partie, on s'interresse aux fonctions Signed Distance Function (SDF) de differentes formes géométriques. On remarque que toutes ces fonctions supposent que l'objet géometrique est centré en $O$. Cela simplifie beaucoup les fontions et il est très facile de leur appliquer une translation ou autre transformation, comme indiqué dans \ref{subsec:Transformations} \nameref{subsec:Transformations}.
 \subsubsection{Sphere}
 La sphere a la plus simple des SDF. En effet, la distance entre un point $P$ et une sphere de rayon $r$ est donnée par 
 \begin{align*}
 distance=length(P)-r
 \end{align*}
 Avec $length(x)=\|x\|_2$.
-\\\textbf{Remarque:} On rappel que le volume est centré en O.
+\\\textbf{Remarque:} On rappelle que le volume est centré en O.
 \subsubsection{Plan}
-La distance entre un point $P$ et un plan de normale $N$ (normalizée) et de hauteur $h$ est donnée par 
+La distance entre un point $P$ et un plan de normale $N$ (normalisée) et de hauteur $h$ est donnée par 
 \begin{alignat*}{1}
     distance=\left\langle P,N \right\rangle - h
 \end{alignat*}
 \subsubsection{Et bien d'autres\ldots}
-Il existe de nombreuses autres fonction SDF. Cependant, elles deviennent très vite complexes à comprendre. Voici par exemple la fonction SDF pour un pavé avec $taille=(largeur, hauteur, profondeur) \in \mathbb{R}^3$
-Cette fontion utilise le fait que la fonction |.| sur un vecteur équivaut à une symetrie par rapport aux plans xOy, xOz, yOz. Or un pavé centré en O possede ces trois plans de symetries. Ainsi, la distance d'un point $P$ à ce pavé est donnée par:
-\begin{align*}
-    q&=P-taille\\
-    distance&=length(max(q,0)+min(max(max(q_x,q_y),q_z),0))
-\end{align*}
+Il existe de nombreuses autres fonctions SDF. Cependant, elles deviennent très vite complexes à comprendre.\\
+Voici par exemple la fonction SDF pour un pavé avec $taille=(largeur, hauteur, profondeur) \in \mathbb{R}^3$
+Cette fontion utilise le fait que la fonction |.| sur un vecteur équivaut à une symetrie par rapport aux plans xOy, xOz et yOz. Or un pavé centré en O possede ces trois plans de symetries. Ainsi, la distance d'un point $P$ à ce pavé est donnée par le code suivant:
+
+\begin{lstlisting}[language=GLSL]
+float SDF_Box(vec3 p, vec3 taille) {
+	vec3 q=abs(p)-taille;
+	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
+}
+\end{lstlisting}
