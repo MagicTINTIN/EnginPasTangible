@@ -28,7 +28,7 @@ const char *scenes[] = {
     "shaders/default.fs",
     "shaders/loopMandel.fs",
     "shaders/artefacts.fs",
-    "shaders/evol.fs"
+    "shaders/evol.fs",
     "shaders/modifier.fs",
     "shaders/quad.fs",
     "shaders/smooth.fs",
