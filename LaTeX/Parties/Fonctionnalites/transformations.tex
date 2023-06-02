@@ -1,9 +1,25 @@
 \newpage
 \subsection{Transformations}\label{subsec:Transformations}
-Les transformations sont la spécificité la plus utile et unique du $Ray\ Marching$. En effet, elles sont extremement peu couteuses en ressources, et permettent de creer des formes uniques.
-\\Pour toutes les transformations sur un volume, il suffit d'appliquer la transformation inverse au point correspondant à la position dont on veut la distance à l'objet.\\
-Par exemple, si l'on souhaite translater un volume vers les $x$ croissants, il faut réduire d'autant la position en $x$.
+Les transformations sont une des spécificités la plus utile et unique du $Ray\ Marching$. En effet, elles sont extremement peu couteuses en ressources, et permettent de creer des formes uniques.
+\\Pour toutes transformations il suffit, lorsqu'on veut obtenir la distance entre un point $P$ de l'espace et un objet transformé, de prendre la distance entre la \textbf{transformation inverse} du point $P$ et l'objet non transformé.
+\\
+\begin{align*}
+    SDF\_Objet\_Tranforme(P)=SDF\_Objet(Transformation\_Inverse(P))
+\end{align*}
+Nous allons maintenant voir quelques exemples.
+
+\subsubsection{Translation}
+Pour obtenir une translation de vecteur $translation$ d'un objet, on peut utiliser le code suivant :
+\begin{lstlisting}[language=GLSL]
+SDL_Objet(p-translation);
+\end{lstlisting}
+
 \subsubsection{Rotation autour des axes XYZ}
+Pour une rotation autour des axes X, Y et Z, d'angles respectivement $alpha$, $beta$ et $gamma$ d'un objet, on utilise le code suivant:
+\begin{lstlisting}[language=GLSL]
+SDL_Objet(Rotation(p,-alpha,-beta,-gamma))
+\end{lstlisting}
+Avec $Rotation$ une application linéaire dont la matrice dans la base cannonique est donnée ici : 
 \begin{align*}
     R(x,y,z)
     =& R_{ex}(x)R_{ey}(y)R_{ez}(z) \\
@@ -31,5 +47,27 @@ Par exemple, si l'on souhaite translater un volume vers les $x$ croissants, il f
 \end{align*}
 
 \subsubsection{Duplication des volumes}
-Pour duppliquer un nombre infini de fois un volume, il suffit d'appliquer un modulo (reste de la division entière) sur la position de l'objet.
+Il est egalement possible d'appliquer des transformations plus complexes, permettant par exemple de dupliquer des objets.
+\\Pour dupliquer un nombre infini de fois un volume, il suffit d'appliquer un modulo (reste de la division entière) sur la position de l'objet.
+\\Le code pour dupliquer un objets à l'infini sur l'axe Ox, toutes les $N$ unités, est celui-ci:
+\begin{lstlisting}[language=GLSL]
+SDF_Objet( vec3( mod(p.x - N/2, N) + N/2, p.y, p.z))
+\end{lstlisting}
+\textbf{Remarque:} $vec3$ est un constructeur de vecteur 3D
 
+\newpage
+\subsubsection{symétrie}
+Il est egalement possible de faire des symetrie par rapport à une plan de normale $N$ et de décalage $offset$. Le code est le suivant:
+\begin{lstlisting}[language=GLSL]
+SDF_Objet(symetrie(p,-normale,-offset));
+\end{lstlisting}
+Avec le code de $symetrie$ :
+\begin{lstlisting}[language=GLSL]
+vec3 symetrie(vec3 position, vec3 normale,float offset){
+    float d=dot(position,normale) + offset;
+    if (d>0) return position;
+    else return position-2.0*d*normale;
+}
+\end{lstlisting}
+Avec $dot$ le produit scalaire.
+\\\textbf{Remarque:} Cette symetrie ne fonctionne que dans un seul sens. C'est à dire que l'un des coté du plan "disparait" pour laisser place au symetrique de l'autre coté du plan.
