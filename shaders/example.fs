@@ -1,9 +1,3 @@
-\subsection{Scène simple}
-%\addcontentsline{toc}{section}{Scène simple}
-Voici à quoi ressemble le code d'un fragment shader en entier.\\
-Cette scène contient uniquement une sphère dans une maille de cube qui tourne sur elle même.\\
-Code à mettre dans un fichier, nommé \emph{example.fs} par exemple.
-\begin{lstlisting}[language=GLSL, title={Example de fragment shader}]
 #version 330 core
 in vec2 FragCoord; //FragCoord = position pixel
 in float Time; //parametre du shader
@@ -73,4 +67,3 @@ void main(){
     vec3 direction = normalize(FragCoord.x * ex + FragCoord.y*ey + 1.0*ez);
     FragColor=vec4(Get_Color(posCamera,direction),1.0);
 }
-\end{lstlisting}
