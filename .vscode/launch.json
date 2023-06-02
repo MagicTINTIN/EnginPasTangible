@@ -21,6 +21,12 @@
             "name": "Compile EPT",
             "request": "launch",
             "type": "node-terminal"
+        },
+        {
+            "command": "${workspaceFolder}/ept ${relativeFile}",
+            "name": "EPT your fs",
+            "request": "launch",
+            "type": "node-terminal"
         }
     ]
 }
