@@ -29,7 +29,10 @@ const char *scenes[] = {
     "shaders/loopMandel.fs",
     "shaders/artefacts.fs",
     "shaders/evol.fs"
-    "shaders/"};
+    "shaders/modifier.fs",
+    "shaders/quad.fs",
+    "shaders/smooth.fs",
+    "shaders/Unity.fs"};
 #define FULLSCREEN 0
 #define EXPERIMENTAL_FEATURES 0
 /* ## DEBUG MODE ##
