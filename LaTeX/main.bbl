@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Quilez()]{knuthwebsite}
+I.~Quilez.
+\newblock Inigo quilez :: computer graphics, mathematics, shaders, fractals,
+  demoscene and more.
+\newblock URL \url{https://iquilezles.org/}.
+
+\end{thebibliography}
