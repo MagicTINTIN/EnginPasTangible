@@ -9,7 +9,7 @@ avec $normalize(\cdot )=\frac{\cdot }{\|\cdot \|}$\\
 \\
 \textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. Cependant, ces points critiques sont négligeables par rapport au volume total des objets. On évitera d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités. Par exemple, on préférera utiliser un pavé très fin plutôt qu'un plan en deux dimensions.
 
-\subsection{Calcul des ombres}
+\subsubsection{Calcul des ombres}
 Pour determiner s'il y a une ombre à un point $P$, il suffit de projeter un rayon d'origine $P$ et de direction $Sun\_Direction$ de la même manière que dans la partie \ref{subsec:projection} \nameref{subsec:projection}. Si le rayon projetté converge, alors il a rencontré un obstacle et il y a une ombre. Sinon, il n'y a pas d'ombre.\\
 \\\textbf{Remarque:} Le calcul des ombres est couteux en ressources.
 
@@ -27,7 +27,7 @@ $$
 \textbf{Remarque} : S'il y a plusieurs sources de lumière, il suffit de sommer la contribution de chacune de ces sources. Il n'est pas necessaire de gerer d'éventuel problème de dépassement de couleur car le shader le fait lui-même.
 
 \newpage
-\subsubsection{Calcul de la couleur de l'objet}
+\subsubsection{Calcul rouge vert bleu à partir d'une teinte}
 
 La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés. La valeur correspond à la teinte de l'objet. Comme montré sur le schéma ci-dessous une valeur à 180 degrés (donc au milieu) correspondrait à du cyan.
 
@@ -44,11 +44,11 @@ Pour reprendre l'exemple du cyan, en se plaçant à 180 degrés on remarque que 
 % \subsection{Calcul de reflexion}
 % Pour rajouter des surfaces reflechissantes au moteur 3D, il faut pouvoir calculer des reflexions. Cela est faisable avec les calculs suivants :
 % \begin{align*}
-%     \Vec{direction} &= \Vec{D}-2*\left\langle \Vec{D},\Vec{N}\right\langle \time \Vec{N}
+%     \Vec{direction} &= \Vec{D}-2*\left\langle \Vec{D},\Vec{N}\right\rangle \time \Vec{N}
 %     Couleur
 % \end{align*}
 
-\subsection{Calcul final de la couleur d'un pixel}
+\subsubsection{Calcul final de la couleur d'un pixel}
 Il faut finalement combiner tous ces calcul de manière à obtenir la couleur finale à afficher. Voici le calcul de la couleur apparente d'un point $P$ d'un objet de couleur $CouleurObjet$ :
 \begin{align*}
     Couleur\_Pixel=min(CouleurObjet,Couleur\_Eclairage)%+reflexion
