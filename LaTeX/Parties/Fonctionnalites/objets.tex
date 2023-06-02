@@ -17,7 +17,7 @@ Il existe de nombreuses autres fonctions SDF. Cependant, elles deviennent très 
 Voici par exemple la fonction SDF pour un pavé avec $taille=(largeur, hauteur, profondeur) \in \mathbb{R}^3$
 Cette fontion utilise le fait que la fonction |.| sur un vecteur équivaut à une symetrie par rapport aux plans xOy, xOz et yOz. Or un pavé centré en O possede ces trois plans de symetries. Ainsi, la distance d'un point $P$ à ce pavé est donnée par le code suivant:
 
-\begin{lstlisting}[language=GLSL]
+\begin{lstlisting}[language=GLSL, title={SDF d'un pavé}]
 float SDF_Box(vec3 p, vec3 taille) {
 	vec3 q=abs(p)-taille;
 	return length(max(q,0.0))+ min(max(q.x,max(q.y,q.z)),0.0);
