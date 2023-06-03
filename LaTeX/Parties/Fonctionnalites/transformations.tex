@@ -1,6 +1,6 @@
 \newpage
 \subsection{Transformations}\label{subsec:Transformations}
-Les transformations sont une des spécificités la plus utile et unique du $Ray\ Marching$. En effet, elles sont extremement peu couteuses en ressources, et permettent de creer des formes uniques.
+Les transformations sont une des spécificités les plus utiles et uniques du $Ray\ Marching$. En effet, elles sont extrêmement peu coûteuses en ressources, et permettent de créer des formes uniques.
 \\Pour toutes transformations il suffit, lorsqu'on veut obtenir la distance entre un point $P$ de l'espace et un objet transformé, de prendre la distance entre la \textbf{transformation inverse} du point $P$ et l'objet non transformé.
 \begin{align*}
     SDF\_Objet\_Tranforme(P)=SDF\_Objet(Transformation\_Inverse(P))
@@ -46,8 +46,8 @@ Avec $Rotation$ une application linéaire dont la matrice dans la base cannoniqu
 \end{align*}
 
 \subsubsection{Duplication des volumes}
-Il est egalement possible d'appliquer des transformations plus complexes, permettant par exemple de dupliquer des objets. Pour dupliquer un nombre infini de fois un volume, il suffit d'appliquer un modulo (reste de la division entière) sur la position de l'objet.
-\\Le code pour dupliquer un objets à l'infini sur l'axe Ox, toutes les $N$ unités, est celui-ci:
+Il est egalement possible d'appliquer des transformations plus complexes, permettant par exemple la duplication d'objets. Pour dupliquer un nombre infini de fois un volume, il suffit d'appliquer un modulo (reste de la division entière) sur la position de l'objet.
+\\Le code pour dupliquer un objet à l'infini sur l'axe Ox, toutes les $N$ unités, est celui-ci:
 \begin{lstlisting}[language=GLSL]
 SDF_Objet( vec3( mod(p.x - N/2, N) + N/2, p.y, p.z))
 \end{lstlisting}
@@ -59,8 +59,8 @@ SDF_Objet( vec3( mod(p.x - N/2, N) + N/2, p.y, p.z))
     \label{fig:infinite}
 \end{figure}
 
-\subsubsection{symétrie}
-Il est egalement possible de faire des symetrie par rapport à une plan de normale $N$ et de décalage $offset$. Le code est le suivant:
+\subsubsection{Symétrie}
+Il est egalement possible de faire des symétries par rapport à un plan de normale $N$ et de décalage $offset$. Le code est le suivant:
 \begin{lstlisting}[language=GLSL]
 SDF_Objet(symetrie(p,-normale,-offset));
 \end{lstlisting}
@@ -73,4 +73,4 @@ vec3 symetrie(vec3 position, vec3 normale,float offset){
 }
 \end{lstlisting}
 Avec $dot$ le produit scalaire.
-\\\textbf{Remarque:} Cette symetrie ne fonctionne que dans un seul sens. C'est à dire que l'un des coté du plan "disparait" pour laisser place au symetrique de l'autre coté du plan.
+\\\textbf{Remarque:} Cette symétrie ne fonctionne que dans un seul sens. C'est à dire que l'un des côtés du plan "disparaît" pour laisser place au symétrique de l'autre côté du plan.
