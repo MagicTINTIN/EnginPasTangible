@@ -1,4 +1,4 @@
-#define APPNAMEVERSION "EnginPasTangible (demo 1.0.0) - "
+#define APPNAMEVERSION "EnginPasTangible (demo 1.0.2) - "
 #include "./Libraries/glad/glad.h"
 #include <stdio.h>
 #include <math.h>

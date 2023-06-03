@@ -150,12 +150,18 @@ float SDF_Sierp2(vec3 p,float s,int n){
 	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
 }
 
-vec2 opu(vec2 v1, vec2 v2){
-	return (v1.x<v2.x) ? v1 : v2;
+mat3 opu(mat3 v1, mat3 v2){
+	return (v1[0].x<v2[0].x) ? v1 : v2;
 }
 
-vec2 SDF_Global(vec3 p){
-    vec2 res = vec2(SDF_Box_Frame(p,vec3(1.),.1),mod(100*Time,360)); //deuxième value:couleur : valeur de hue entre 0 et 360
+mat3 SDF_Global(vec3 p){
+	// mat3 (sdf, 0 , 0,
+	//		 hue (0->360),saturation(0->1),value(0->1),
+	//		 specular(no shadow on it : 0->1), reflection (0->1), 0)
+
+    mat3 res = mat3(SDF_Box_Frame(p,vec3(1.),.1),0,0,
+					mod(100*Time,360),1.,1.,
+					.5+.5*cos(Time), 0, 0); //deuxième value:couleur : valeur de hue entre 0 et 360
 	// Par exemple
 	// 000 : rouge
 	// 060 : jaune
@@ -166,38 +172,40 @@ vec2 SDF_Global(vec3 p){
 	// 360 : noir
 	// 420 : white
 	// ajoutez 480 pour obtenir la même couleur mais avec de la réflexion
-    res=opu(res,vec2(SDF_Sphere(p,.2),480+420));
+    res=opu(res,mat3(SDF_Sphere(p,.2),0,0,
+					1.,0.,1.,
+					0, .5+.5*cos(Time), 0));
 	return res;
 }
 
-vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
+mat3 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	vec2 dist;
+	mat3 dist;
 	for(int i=0;i<260;i++){
 		dist=SDF_Global(pos);
-		pos+=dist.x*dir;
-		if(dist.x<=.01) return vec4(pos,dist.y);
-		if(dist.x>=200.0) return vec4(pos,-1.);
+		pos+=dist[0].x*dir;
+		if(dist[0].x<=.01) return mat3(pos,dist[1],dist[2]);;
+		if(dist[0].x>=200.0) return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
 	}
-	return vec4(pos,-1.);
+	return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
 }
 
 vec3 grad(vec3 p){
 	vec2 epsilon = vec2(.01,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
-												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
-												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
+	return normalize(vec3(SDF_Global(p+epsilon.xyy)[0].x-SDF_Global(p-epsilon.xyy)[0].x,
+		SDF_Global(p+epsilon.yxy)[0].x-SDF_Global(p-epsilon.yxy)[0].x,
+		SDF_Global(p+epsilon.yyx)[0].x-SDF_Global(p-epsilon.yyx)[0].x));
 }
 
-vec3 HSV(float c){
+vec3 HSV(vec3 c){
 	// converting hsv to rgb
 
 	// may be we'll be able to modify them in the future
-	float value = 1.;
-	float sat = 1.;
+	float value = c.z;
+	float sat = c.y;
 
 	float chroma = value * sat;
-	float hue = mod(c / 60,8.0);
+	float hue = mod(c.x / 60,8.0);
 	float interm = chroma*(1-abs(mod(hue, 2) - 1));
 
 	vec3 couleur = vec3(1.);
@@ -208,12 +216,17 @@ vec3 HSV(float c){
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
-	return couleur;
+	return couleur + value - chroma;
+}
+
+float speclr(float fact, float val) {
+	return fact + (1 - fact) * val;
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec3 sunPos=vec3(0.,.7,0);
-	vec4 impact = Get_Impact(origin,dir);
+	mat3 impact = Get_Impact(origin,dir);
+	vec3 impactcolor = impact[1];
 	
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
@@ -221,24 +234,24 @@ vec3 Get_Color(vec3 origin,vec3 dir){
   vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.8*sunPos.y,1.*sunPos.y);
 
   // changement du ciel
-	if(impact.w<0.) {
+	if(impactcolor.x<0.) {
 		return skycolor+dotdirsun;
   	}
-	vec3 normale=grad(impact.xyz);
+	vec3 normale=grad(impact[0]); //.xyz
 	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
-	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
-	float f=ombre.w<0.?1.:.5;
-	vec3 couleur = HSV(impact.w);
+	mat3 ombre = Get_Impact(impact[0]+0.02*normale,sunPos);
+	float f=ombre[1].x<0.?1.:.5;
+	vec3 couleur = HSV(impactcolor);
   	vec3 g=vec3(0.);
-  	if (impact.w/60 > 8.0){
+  	if (impact[2].y > .0){
 	
-  		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5*skycolor;
-		g*=clamp(dot(sunPos,grad(reflexion.xyz)),0.,1.);
+  		mat3 reflexion = Get_Impact(impact[0]+0.02*normale,normalize(symetrique));
+		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*skycolor;
+		g*=clamp(speclr(reflexion[2].x,dot(sunPos,grad(reflexion[0]))),0.,1.);
 	
 	}
     
-    return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // better reflections
+    return skycolor*couleur*speclr(impact[2].x,clamp(dot(sunPos,normale),0.,1.))*speclr(impact[2].x,f)+g; // better reflections
 	
 }
 
