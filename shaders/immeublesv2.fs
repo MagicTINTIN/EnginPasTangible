@@ -134,54 +134,173 @@ float SDF_Cylinder( vec3 p, float h, float r )
   return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
-vec2 opu(vec2 v1, vec2 v2){
-	return (v1.x<v2.x) ? v1 : v2;
+mat3 opu(mat3 v1, mat3 v2){
+	return (v1[0].x<v2[0].x) ? v1 : v2;
 }
 
-vec2 SDF_Global(vec3 p){
-    // immeuble
-    vec2 res = vec2(SDF_Box_Frame(repeat(p-vec3(0,21.0,0), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(1.,1.,1.),.1),420);
-    res = opu(res, vec2(SDF_Box(repeat(p-vec3(0,21.05,0.), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(.9)),180+480));
-    // herbe
-    res = opu(res, vec2(SDF_Box(p,vec3(20.,0.1,50.)),120));
-    // route
-    res = opu(res, vec2(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),240));
-    res = opu(res, vec2(SDF_Box(p-vec3(12.,0.,0.),vec3(2.,0.1,50.)),240));
-    // lampadaire rgb
-    res = opu(res, vec2(SDF_Cone(p-vec3(17.,0.,-1.),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),480+390));
-    res = opu(res, vec2(SDF_Cylinder(p-vec3(17.,2.,-1.),2.,.2),480+390));
-    res = opu(res, vec2(SDF_Sphere(p-vec3(17.,4.,-1.),.5),mod(100*Time, 360)));
+float rand(vec2 co){
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+// Classic Perlin noise, periodic variant : https://github.com/hughsk/glsl-noise/blob/master/periodic/3d.glsl
+
+vec3 mod289(vec3 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289(vec4 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x)
+{
+  return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r)
+{
+  return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+  return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+// Classic Perlin noise, periodic variant
+float pnoise(vec3 P, vec3 rep)
+{
+  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
+  vec3 Pf0 = fract(P); // Fractional part for interpolation
+  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+  vec4 iy = vec4(Pi0.yy, Pi1.yy);
+  vec4 iz0 = Pi0.zzzz;
+  vec4 iz1 = Pi1.zzzz;
+
+  vec4 ixy = permute(permute(ix) + iy);
+  vec4 ixy0 = permute(ixy + iz0);
+  vec4 ixy1 = permute(ixy + iz1);
+
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+  gx0 = fract(gx0);
+  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+  vec4 sz0 = step(gz0, vec4(0.0));
+  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+  gx1 = fract(gx1);
+  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+  vec4 sz1 = step(gz1, vec4(0.0));
+  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+
+  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+
+  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+  g000 *= norm0.x;
+  g010 *= norm0.y;
+  g100 *= norm0.z;
+  g110 *= norm0.w;
+  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+  g001 *= norm1.x;
+  g011 *= norm1.y;
+  g101 *= norm1.z;
+  g111 *= norm1.w;
+
+  float n000 = dot(g000, Pf0);
+  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+  float n111 = dot(g111, Pf1);
+
+  vec3 fade_xyz = fade(Pf0);
+  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
+  return 2.2 * n_xyz;
+}
+
+
+
+mat3 SDF_Global(vec3 p){
+  // immeuble
+  mat3 res = mat3(SDF_Box_Frame(repeat(p-vec3(0,21.0,0), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(1.,1.,1.),.1),0, 0,
+	0, 0, 1.,
+	0,0,0);
+    res = opu(res, mat3(SDF_Box(repeat(p-vec3(0,21.05,0.), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(.9)),0,0,
+	210,.5,1.,
+	.0,.5,0));
+  // herbe
+  res = opu(res, mat3(SDF_Box(p,vec3(20.,0.1,50.)),0,0, //-vec3(0,.1*cos(p.x+p.y),0)
+	//120,.8,.4+.1*pnoise(p, vec3(21,21,21.)),//+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z), LAGGY
+  120,.8,.4+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z),
+	0,0,0));
+  // route
+  res = opu(res, mat3(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),0,0,
+	240,.7,.2,
+	0,0,0));
+  res = opu(res, mat3(SDF_Box(p-vec3(12.,0.,0.),vec3(2.,0.1,50.)),0,0,
+	240,.7,.2,
+	0,0,0));
+  // lampadaire rgb
+  res = opu(res, mat3(SDF_Cone(p-vec3(17.,0.,-1.),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),0,0,
+	0,0,.5,
+	0,.4,0));
+    res = opu(res, mat3(SDF_Cylinder(p-vec3(17.,2.,-1.),2.,.2),0,0,
+	0,0,.5,
+	0,.4,0));
+  res = opu(res, mat3(SDF_Sphere(p-vec3(17.,4.,-1.),.5),0,0,
+	mod(100*Time, 360),.5,1.,
+	1.,0,0));
     return res;
 }
 
-vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
+mat3 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
-	vec2 dist;
-	for(int i=0;i<260;i++){
+	mat3 dist;
+	for(int i=0;i<160;i++){
 		dist=SDF_Global(pos);
-		pos+=dist.x*dir;
-		if(dist.x<=.01) return vec4(pos,dist.y);
-		if(dist.x>=200.0) return vec4(pos,-1.);
+		pos+=dist[0].x*dir;
+		if(dist[0].x<=.01) return mat3(pos,dist[1],dist[2]);;
+		if(dist[0].x>=200.0) return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
 	}
-	return vec4(pos,-1.);
+	return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
 }
 
 vec3 grad(vec3 p){
 	vec2 epsilon = vec2(.01,0.);
-	return normalize(vec3(SDF_Global(p+epsilon.xyy).x-SDF_Global(p-epsilon.xyy).x,
-												SDF_Global(p+epsilon.yxy).x-SDF_Global(p-epsilon.yxy).x,
-												SDF_Global(p+epsilon.yyx).x-SDF_Global(p-epsilon.yyx).x));
+	return normalize(vec3(SDF_Global(p+epsilon.xyy)[0].x-SDF_Global(p-epsilon.xyy)[0].x,
+		SDF_Global(p+epsilon.yxy)[0].x-SDF_Global(p-epsilon.yxy)[0].x,
+		SDF_Global(p+epsilon.yyx)[0].x-SDF_Global(p-epsilon.yyx)[0].x));
 }
 
-vec3 HSV(float c){
+vec3 HSV(vec3 c){
 	// converting hsv to rgb
 
 	// may be we'll be able to modify them in the future
-	float value = 1.;
-	float sat = 1.;
+	float value = c.z;
+	float sat = c.y;
 
 	float chroma = value * sat;
-	float hue = mod(c / 60,8.0);
+	float hue = mod(c.x / 60,8.0);
 	float interm = chroma*(1-abs(mod(hue, 2) - 1));
 
 	vec3 couleur = vec3(1.);
@@ -192,38 +311,47 @@ vec3 HSV(float c){
 	else if (hue<=5.0) couleur = vec3(interm,0.,chroma);
 	else if (hue<=6.0) couleur = vec3(chroma,0.,interm);
 	else if (hue<=7.0) couleur = vec3(interm,interm,interm);
-	return couleur;
+	return couleur + value - chroma;
+}
+
+float speclr(float fact, float val) {
+	return fact + (1 - fact) * val;
+}
+
+vec3 speclr(float fact, vec3 val) {
+	return fact + (1 - fact) * val;
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
-	vec4 impact = Get_Impact(origin,dir);
+	vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.5+2*cos(.2*Time),.6,0)));
+	if (CustomToggle == 1)
+		sunPos=normalize(rotate(vec3(.2,1.,.0),vec3(.4*cos(.2*Time),.6,0)));
+	mat3 impact = Get_Impact(origin,dir);
+	vec3 impactcolor = impact[1];
 	
-  vec3 sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(.5+2*cos(.2*Time),.6,0)));
-  if (CustomToggle == 1)
-    sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(cos(.2*Time),.6,0)));
-
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
-  vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
-  // changement du ciel
-	if(impact.w<0.) {
+  	vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
+
+  	// changement du ciel
+	if(impactcolor.x<0.) {
 		return skycolor+dotdirsun;
   	}
-	vec3 normale=grad(impact.xyz);
+	vec3 normale=grad(impact[0]); //.xyz
 	vec3 symetrique = reflect(dir,normale);// <=> dir-2.0*dot(dir,normale)*normale;
-	vec4 ombre = Get_Impact(impact.xyz+0.02*normale,sunPos);
-	float f=ombre.w<0.?1.:.5;
-	vec3 couleur = HSV(impact.w);
+	mat3 ombre = Get_Impact(impact[0]+0.02*normale,sunPos);
+	float f=ombre[1].x<0.?1.:.5;
+	vec3 couleur = HSV(impactcolor);
   	vec3 g=vec3(0.);
-  	if (impact.w/60 > 8.0){
+  	if (impact[2].y > .0){
 	
-  		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5*skycolor;
-		g*=clamp(dot(sunPos,grad(reflexion.xyz)),0.,1.);
+  		mat3 reflexion = Get_Impact(impact[0]+0.02*normale,normalize(symetrique));
+		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*skycolor;
+		g*=clamp(speclr(reflexion[2].x,dot(sunPos,grad(reflexion[0]))),0.,1.);
 	
 	}
     
-    return skycolor*couleur*clamp(dot(sunPos,normale),0.,1.)*f+g; // better reflections
+    return couleur*speclr(impact[2].x,skycolor*clamp(dot(sunPos,normale),0.,1.)*f)+g;
 	
 }
 

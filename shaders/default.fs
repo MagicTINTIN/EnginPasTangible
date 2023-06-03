@@ -184,7 +184,7 @@ mat3 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1
 	for(int i=0;i<260;i++){
 		dist=SDF_Global(pos);
 		pos+=dist[0].x*dir;
-		if(dist[0].x<=.01) return mat3(pos,dist[1],dist[2]);;
+		if(dist[0].x<=.01) return mat3(pos,dist[1],dist[2]);
 		if(dist[0].x>=200.0) return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
 	}
 	return mat3(pos,vec3(-1,0,0),vec3(0,0,0));
@@ -223,6 +223,10 @@ float speclr(float fact, float val) {
 	return fact + (1 - fact) * val;
 }
 
+vec3 speclr(float fact, vec3 val) {
+	return fact + (1 - fact) * val;
+}
+
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec3 sunPos=vec3(0.,.7,0);
 	mat3 impact = Get_Impact(origin,dir);
@@ -251,7 +255,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	
 	}
     
-    return skycolor*couleur*speclr(impact[2].x,clamp(dot(sunPos,normale),0.,1.))*speclr(impact[2].x,f)+g; // better reflections
+    return couleur*speclr(impact[2].x,skycolor*clamp(dot(sunPos,normale),0.,1.)*f)+g;
 	
 }
 

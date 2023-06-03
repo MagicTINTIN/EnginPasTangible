@@ -15,6 +15,12 @@ Moteur graphique qu'est pas croyable tellement qu'il est bien !<br>
 ![Evolution du moteur graphique](./screenshots/evolutionEPT.gif)<br>
 Evolution du moteur graphique (première version à la v1.0.0)
 
+![Ocean](./screenshots/mer.gif)<br>
+Petite animation d'océan
+
+![Ville](./screenshots/journuitmegavillev0.1.2.gif)<br>
+Cycle jour/nuit dans une ville
+
 ---
 ## Contrôles
 Les déplacements se font en vue aérienne.<br>
