@@ -1,0 +1,5 @@
+{"rule":"FR_SIMPLE_REPLACE","sentence":"^\\QCelui-ci permet l'implémentation de OpenGL Shading Language (GLSL), un langage de shading.\\E$"}
+{"rule":"D_N","sentence":"^\\QNotre moteur 3D repose principalement sur les Fragment Shaders.\\E$"}
+{"rule":"J_N","sentence":"^\\QLa contribution de cette source de lumière à l'éclairement d'un objet blanc de normale \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q au point \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q est donnée par ce calcul : \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"PLACE_DE_LA_VIRGULE","sentence":"^\\QIl n'est pas nécessaire de gérer d'éventuel problème de dépassement de couleur car le shader le fait lui-même.\\E$"}
+{"rule":"PLACE_DE_LA_VIRGULE","sentence":"^\\QIl n'est pas nécessaire de gérer d'éventuels problèmes de dépassement de couleur car le shader le fait lui-même.\\E$"}

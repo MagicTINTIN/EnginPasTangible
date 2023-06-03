@@ -4,7 +4,7 @@
 %%\nameref{Projection des rayons}
 Pour projeter un rayon, on le fait avancer pas à pas. La distance des pas doit être la plus grande possible, mais sans que le rayon ne traverse d'objet de la scène 3D.\\
 \\
-Afin de projeter les rayons partant du point $Origine\_Camera\in \mathbb{R}^3$ et de direction $Direction\in \mathbb{R}^3$, on utilise la suite suivante:
+Afin de projeter les rayons partant du point $Origine\_Camera\in \mathbb{R}^3$ et de direction $Direction\in \mathbb{R}^3$, on utilise la suite suivante :
 $$
 (Pos_n)_{n\in \mathbb{N}}=\left\{
     \begin{array}{ll}
@@ -24,6 +24,6 @@ $$
 \textbf{Remarque} : La suite "avance" dans le sens de \emph{Direction} avec un pas de $SDF\_Scene(Pos_n)$\\
 \\
 Si la suite \textbf{diverge}, alors le rayon n'a rencontré aucun obstacle. On affichera donc la couleur du ciel.\\
-Si la suite \textbf{converge} vers une limite, alors cette limite est le point d'intersection entre la scène 3D et le rayon. On appelera ce point d'intersection le point \textbf{P}.\\
+Si la suite \textbf{converge} vers une limite, alors cette limite est le point d'intersection entre la scène 3D et le rayon. On appellera ce point d'intersection le point \textbf{P}.\\
 \\
-La section suivante explique comment determiner la couleur à afficher dans ce cas là.
+La section suivante explique comment déterminer la couleur à afficher dans ce cas-là.
