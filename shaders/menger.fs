@@ -94,15 +94,13 @@ float SDF_Global(vec3 p){
 vec4 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
 	float dist;
-	float tot=0.;
 	for(int i=0;i<60;i++){
 		dist=SDF_Global(pos);
 		pos+=dist*dir;
-		tot+=dist;
-		if(dist<=.001) return vec4(tot,tot,tot,1.);
-		if(dist>=20.0) return vec4(tot,tot,tot,-1.);
+		if(dist<=.001) return vec4(pos,1.);
+		if(dist>=20.0) return vec4(pos,-1.);
 	}
-	return vec4(tot,tot,tot,-1.);
+	return vec4(pos,-1.);
 }
 
 vec3 grad(vec3 p){
@@ -114,7 +112,6 @@ vec3 grad(vec3 p){
 
 vec3 Get_Color(vec3 origin,vec3 dir){
 	vec4 impact = Get_Impact(origin,dir);
-	return vec3(impact.xyz*0.01);
 	if(impact.w<0.) return vec3(.5,.8,.9)+.5*dir.y+.05*clamp(origin.y-10.,-10.,10.);
 	vec3 normale=grad(impact.xyz);
 	vec3 sunPos=normalize(vec3(1.,2.,3.));
