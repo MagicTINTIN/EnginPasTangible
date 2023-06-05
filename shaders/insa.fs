@@ -156,6 +156,12 @@ float SDF_Cylinder( vec3 p, float h, float r )
   return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
+float SDF_Prism( vec3 p, vec2 h )
+{
+  vec3 q = abs(p);
+  return max(q.z-h.y,max(q.x*0.866025+p.y*0.5,-p.y)-h.x*0.5);
+}
+
 mat3 opu(mat3 v1, mat3 v2){
 	return (v1[0].x<v2[0].x) ? v1 : v2;
 }
@@ -165,35 +171,118 @@ mat3 SDF_Global(vec3 p){
 	//		 hue (0->360),saturation(0->1),value(0->1),
 	//		 specular(no shadow on it : 0->1), reflection (0->1), 0)
 
-    mat3 res = mat3(
-		max(
-			SDF_Cylinder(p-vec3(1, 0,0),2,1),
-			max(
-					SDF_Box(p-vec3(1,0,1),vec3(1.)),
-					-SDF_Cylinder(p-vec3(1,0,0),2,.5)
-				)
-			)
+	float insapos = 0;
+	float xoffset = 0; //1.75
+
+
+	// I
+	float ioffset = insapos - 6;
+	mat3 res = mat3(
+		SDF_Box(p-vec3(xoffset ,0,ioffset),vec3(1.75,1.,.5))
 		,0,0,
 		0,1.,1.,
 		0,0,0);
-	res = opu(res, mat3(
+
+	// S
+	float soffest = 1 + insapos;
+    res = opu(res, mat3(
 		max(
-			SDF_Cylinder(p-vec3(0, 0,-1),2,1),
+			SDF_Cylinder(p-vec3(xoffset-.75, 0,soffest),2,1),
 			max(
-					SDF_Box(p-vec3(0,0,0),vec3(1.)),
-					-SDF_Cylinder(p-vec3(0,0,-1),2,.5)
+					SDF_Box(p-vec3(xoffset-.75,0,1+soffest),vec3(1.)),
+					-SDF_Cylinder(p-vec3(xoffset-.75,0,soffest),2,.5)
 				)
 			)
 		,0,0,
 		0,1.,1.,
 		0,0,0));
+	res = opu(res, mat3(
+		max(
+			SDF_Cylinder(p-vec3(xoffset+.75, 0,soffest),2,1),
+			max(
+					SDF_Box(p-vec3(xoffset+.75,0,-1+soffest),vec3(1.)),
+					-SDF_Cylinder(p-vec3(xoffset+.75,0,soffest),2,.5)
+				)
+			)
+		,0,0,
+		0,1.,1.,
+		0,0,0));
+	res = opu(res, mat3(
+		min(
+			SDF_Box(p-vec3(xoffset+1.5,0,0.5+soffest),vec3(.25,1,.5)),
+			SDF_Box(p-vec3(xoffset-1.5,0,-.5+soffest),vec3(.25,1,.5))
+		)
+		,0,0,
+		0,1.,1.,
+		0,0,0));
+
+
+	// A
+	float aoffset = 4.5+insapos;
+	res = opu(res, mat3(
+		max (
+			max (
+				max (
+					max (
+						max (
+							max(
+								SDF_Box(p-vec3(xoffset,0,aoffset),vec3(1.7,1,1.7)),
+								-SDF_Box(p-vec3(xoffset-1.5,0,aoffset),vec3(.5,2,1)) // creux bas A
+							),
+
+							-SDF_Prism(rotate(p-vec3(xoffset,0,aoffset),vec3(0.5*3.14156,0.*3.14156,0.5*3.14156)),vec2(1,2)) // trou A
+						),
+						-SDF_Prism(rotate(p-vec3(xoffset+1.5,0,aoffset+2),vec3(0.5*3.14156,1.*3.14156,0.5*3.14156)),vec2(3,2)) // /gauche
+					),
+					-SDF_Prism(rotate(p-vec3(xoffset+1.5,0,aoffset-2),vec3(0.5*3.14156,1.*3.14156,0.5*3.14156)),vec2(3,2)) // \ droit
+				),
+				-SDF_Prism(rotate(p-vec3(xoffset-1.5,0,aoffset-1),vec3(0.5*3.14156,0.*3.14156,0.5*3.14156)),vec2(.5,2)) 
+			),
+			-SDF_Prism(rotate(p-vec3(xoffset-1.5,0,aoffset+1),vec3(0.5*3.14156,0.*3.14156,0.5*3.14156)),vec2(.5,2))
+		)
+		,0,0,
+		0,1.,1.,
+		0,0,0));
+
+
+
+	// N
+	float noffset = -2.5+insapos;
+	res = opu(res, mat3(
+		
+		max (
+			max (
+				-max(
+					
+					SDF_Prism(rotate(p-vec3(xoffset-1.1,0,noffset-1.),vec3(0.5*3.14156,0.*3.14156,.5*3.14156)),vec2(2.1,2)), // /gauche
+					SDF_Box(p-vec3(xoffset-1,0,noffset),vec3(2,2,1.))
+				),
+				SDF_Box(p-vec3(xoffset,0,noffset),vec3(1.7,1,1.7))
+				
+			),
+			-max(
+					
+					SDF_Prism(rotate(p-vec3(xoffset+1.1,0,noffset+1.),vec3(0.5*3.14156,1.*3.14156,.5*3.14156)),vec2(2.1,2)), // /gauche
+					SDF_Box(p-vec3(xoffset+1.1,0,noffset),vec3(2,2,1.))
+				)
+		)
+		,0,0,
+		0,1.,1.,
+		0,0,0));
+
+		res = opu(res, mat3(
+		SDF_Box(p-vec3(xoffset ,-1,insapos-.25),vec3(3,.1,7.25))
+		,0,0,
+		0,0.,1.,
+		0,0,0));
+
 	return res;
 }
 
 mat3 Get_Impact(vec3 origin,vec3 dir){//must have length(dir)==1 
 	vec3 pos=origin;
 	mat3 dist;
-	for(int i=0;i<260;i++){
+	for(int i=0;i<60;i++){
 		dist=SDF_Global(pos);
 		pos+=dist[0].x*dir;
 		if(dist[0].x<=.01) return mat3(pos,dist[1],dist[2]);
@@ -240,7 +329,7 @@ vec3 speclr(float fact, vec3 val) {
 }
 
 vec3 Get_Color(vec3 origin,vec3 dir){
-	vec3 sunPos=vec3(0.,.7,0);
+	vec3 sunPos=normalize(rotate(vec3(.2,1.,.0),vec3(.4*cos(.8*Time),.6,0)));
 	mat3 impact = Get_Impact(origin,dir);
 	vec3 impactcolor = impact[1];
 	

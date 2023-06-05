@@ -31,7 +31,6 @@ const char *scenes[] = {
     "shaders/sierp.fs",
     "shaders/immeublesv2.fs",
     "shaders/lamer.fs",
-    "shaders/insa.fs",
     "shaders/hsvr.fs",
     "shaders/Unity.fs",
     "shaders/menger.fs",
