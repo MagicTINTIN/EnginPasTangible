@@ -1,0 +1,6 @@
+{
+    "ltex.additionalRules.languageModel": "fr",
+    "ltex.additionalRules.motherTongue": "fr",
+    "ltex.language": "fr",
+    "latex-workshop.message.badbox.show": false
+}

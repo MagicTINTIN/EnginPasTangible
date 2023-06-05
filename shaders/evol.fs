@@ -149,11 +149,15 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	vec3 sunPos=vec3(1.);
     if (CustomInt >= 2)
         sunPos=normalize(rotate(vec3(.1,1.,.0),vec3(1.3*cos(.4*Time),.6,0)));
+	
+	if (CustomInt >= 10)
+		sunPos=normalize(rotate(vec3(.2,1.,.0),vec3(.4*cos(.2*Time),.6,0)));
 	float dotdirsun = clamp(dot(sunPos, dir),0.,1.);
 
   vec3 skycolor = vec3(.3+0.4*sunPos.y,.1+.7*sunPos.y,.8*sunPos.y);
   // changement du ciel
 	if(impact.w<0.) {
+		
         if (CustomInt >= 9)
             return skycolor+dotdirsun;
         if (CustomInt >= 6)
@@ -174,7 +178,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
 	if (CustomInt >= 12){
 		
   		vec4 reflexion = Get_Impact(impact.xyz+0.02*normale,normalize(symetrique));
-		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.5*skycolor;
+		g=reflexion.w<0.?vec3(0.):HSV(reflexion.w)*.9*skycolor;
 		g*=clamp(dot(sunPos,grad(reflexion.xyz)),0.,1.);
 		
 	} else {

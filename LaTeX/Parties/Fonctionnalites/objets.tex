@@ -1,12 +1,12 @@
 \subsection{Volumes élémentaires}
-Dans cette partie, on s'interresse aux fonctions Signed Distance Function (SDF) de differentes formes géométriques. On remarque que toutes ces fonctions supposent que l'objet géometrique est centré en $O$. Cela simplifie beaucoup les fontions et il est très facile de leur appliquer une translation ou autre transformation, comme indiqué dans \ref{subsec:Transformations} \nameref{subsec:Transformations}.
-\subsubsection{Sphere}
-La sphere a la plus simple des SDF. En effet, la distance entre un point $P$ et une sphere de rayon $r$ est donnée par 
+Dans cette partie, on s'intéresse aux fonctions Signed Distance Function (SDF) de différentes formes géométriques. On remarque que toutes ces fonctions supposent que l'objet géométrique est centré en $O$. Cela simplifie beaucoup les fonctions et il est très facile de leur appliquer une translation ou autre transformation, comme indiqué dans \ref{subsec:Transformations} \nameref{subsec:Transformations}.
+\subsubsection{Sphère}
+La sphère a la plus simple des SDF. En effet, la distance entre un point $P$ et une sphère de rayon $r$ est donnée par 
 \begin{align*}
 distance=length(P)-r
 \end{align*}
 Avec $length(x)=\|x\|_2$.
-\\\textbf{Remarque:} On rappelle que le volume est centré en O.
+\\\textbf{Remarque :} On rappelle que le volume est centré en O.
 \subsubsection{Plan}
 La distance entre un point $P$ et un plan de normale $N$ (normalisée) et de hauteur $h$ est donnée par 
 \begin{alignat*}{1}
@@ -15,7 +15,7 @@ La distance entre un point $P$ et un plan de normale $N$ (normalisée) et de hau
 \subsubsection{Et bien d'autres\ldots}
 Il existe de nombreuses autres fonctions SDF. Cependant, elles deviennent très vite complexes à comprendre.\\
 Voici par exemple la fonction SDF pour un pavé avec $taille=(largeur, hauteur, profondeur) \in \mathbb{R}^3$
-Cette fontion utilise le fait que la fonction |.| sur un vecteur équivaut à une symetrie par rapport aux plans xOy, xOz et yOz. Or un pavé centré en O possede ces trois plans de symetries. Ainsi, la distance d'un point $P$ à ce pavé est donnée par le code suivant:
+Cette fonction utilise le fait que la fonction |.| sur un vecteur équivaut à une symétrie par rapport aux plans xOy, xOz et yOz. Or, un pavé centré en O possède ces trois plans de symétries. Ainsi, la distance d'un point $P$ à ce pavé est donnée par le code suivant :
 
 \begin{lstlisting}[language=GLSL]
 float SDF_Box(vec3 p, vec3 taille) {

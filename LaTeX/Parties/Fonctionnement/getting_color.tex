@@ -7,11 +7,11 @@ Pour les calculs de couleurs, on va avoir besoin de la normale $\Vec{N}$ de la s
 \end{align*}
 avec $normalize(\cdot )=\frac{\cdot }{\|\cdot \|}$\\
 \\
-\textbf{Remarque} : on utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme par exemple à l'interieur d'un plan sans volume. Cependant, ces points critiques sont négligeables par rapport au volume total des objets. On évitera d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités. Par exemple, on préférera utiliser un pavé très fin plutôt qu'un plan en deux dimensions.
+\textbf{Remarque} : On utilise le fait que $SDF\_Scene$ est $\mathcal{C}^1(\mathbb{R}^3,\mathbb{R})$ sauf en certains points particuliers, comme à l'intérieur d'un plan sans volume. Cependant, ces points critiques sont négligeables par rapport au volume total des objets. On évitera d'utiliser certaines figures, au profit d'autres ayant moins de discontinuités. Par exemple, on préférera utiliser un pavé très fin plutôt qu'un plan en deux dimensions.
 
 \subsubsection{Calcul des ombres}
-Pour determiner s'il y a une ombre à un point $P$, il suffit de projeter un rayon d'origine $P$ et de direction $Sun\_Direction$ de la même manière que dans la partie \ref{subsec:projection} \nameref{subsec:projection}. Si le rayon projetté converge, alors il a rencontré un obstacle et il y a une ombre. Sinon, il n'y a pas d'ombre.\\
-\\\textbf{Remarque:} Le calcul des ombres est couteux en ressources.
+Pour déterminer s'il y a une ombre à un point $P$, il suffit de projeter un rayon d'origine $P$ et de direction $Sun\_Direction$ de la même manière que dans la partie \ref{subsec:projection} \nameref{subsec:projection}. Si le rayon projeté converge, alors il a rencontré un obstacle et il y a une ombre. Sinon, il n'y a pas d'ombre.\\
+\\\textbf{Remarque :} Le calcul des ombres est couteux en ressources.
 
 \begin{figure}[h]
     \centering
@@ -31,12 +31,12 @@ $$
         \end{array}
     \right.
 $$
-\textbf{Remarque} : S'il y a plusieurs sources de lumière, il suffit de sommer la contribution de chacune de ces sources. Il n'est pas necessaire de gerer d'éventuel problème de dépassement de couleur car le shader le fait lui-même.
+\textbf{Remarque} : S'il y a plusieurs sources de lumière, il suffit de sommer la contribution de chacune de ces sources. Il n'est pas nécessaire de gérer d'éventuels problèmes de dépassement de couleur car le shader le fait lui-même.
 
 \newpage
-\subsubsection{Calcul rouge vert bleu à partir d'une teinte}
+\subsubsection{Calcul du rouge, vert, bleu à partir d'une teinte}
 
-La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés. La valeur correspond à la teinte de l'objet. Comme montré sur le schéma ci-dessous une valeur à 180 degrés (donc au milieu) correspondrait à du cyan.
+La couleur des objets est donnée par une valeur comprise entre 0 et 359 degrés. La valeur correspond à la teinte de l'objet. Comme montré sur le schéma ci-dessous, une valeur à 180 degrés (donc au milieu) correspondrait à du cyan.
 
 \begin{figure}[h]
     \centering
@@ -44,7 +44,7 @@ La couleur des objets est donnée par une valeur comprise entre 0 et 360 degrés
     \caption{Décomposition de la couleur }\label{fig:huetorgb}
 \end{figure}
 
-On remarque que l'on peut facilement calculer les valeurs de rouge, de vert et de bleu (comprises entre 0 et 1) nécessaires à l'obtention de la coueleur souhaitée.\\
+On remarque que l'on peut facilement calculer les valeurs de rouge, de vert et de bleu (comprises entre 0 et 1) nécessaires à l'obtention de la couleur souhaitée.\\
 En effet, il suffit de découper la courbe tous les 60 degrés et on obtient des courbes constantes ou linéaires.\\
 Pour reprendre l'exemple du cyan, en se plaçant à 180 degrés on remarque que le rouge vaut 0 et que le bleu et le vert valent 1.
 
@@ -56,7 +56,7 @@ Pour reprendre l'exemple du cyan, en se plaçant à 180 degrés on remarque que 
 % \end{align*}
 
 \subsubsection{Calcul final de la couleur d'un pixel}
-Il faut finalement combiner tous ces calcul de manière à obtenir la couleur finale à afficher. Voici le calcul de la couleur apparente d'un point $P$ d'un objet de couleur $CouleurObjet$ :
+Il faut finalement combiner tous ces calculs de manière à obtenir la couleur finale à afficher. Voici le calcul de la couleur apparente d'un point $P$ d'un objet de couleur $CouleurObjet$ :
 \begin{align*}
     Couleur\_Pixel=min(CouleurObjet,Couleur\_Eclairage)%+reflexion
 \end{align*}

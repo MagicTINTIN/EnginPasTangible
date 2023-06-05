@@ -150,6 +150,12 @@ float SDF_Sierp2(vec3 p,float s,int n){
 	return SDF_tetra2(ps,s);//min(SDF_Sphere(ps,.2),SDF_tetra(ps,s));
 }
 
+float SDF_Cylinder( vec3 p, float h, float r )
+{
+  vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
 mat3 opu(mat3 v1, mat3 v2){
 	return (v1[0].x<v2[0].x) ? v1 : v2;
 }
@@ -159,22 +165,28 @@ mat3 SDF_Global(vec3 p){
 	//		 hue (0->360),saturation(0->1),value(0->1),
 	//		 specular(no shadow on it : 0->1), reflection (0->1), 0)
 
-    mat3 res = mat3(SDF_Box_Frame(p,vec3(1.),.1),0,0,
-					mod(100*Time,360),1.,1.,
-					.5+.5*cos(Time), 0, 0); //deuxième value:couleur : valeur de hue entre 0 et 360
-	// Par exemple
-	// 000 : rouge
-	// 060 : jaune
-	// 120 : vert
-	// 180 : cyan
-	// 240 : bleu
-	// 300 : rose
-	// 360 : noir
-	// 420 : white
-	// ajoutez 480 pour obtenir la même couleur mais avec de la réflexion
-    res=opu(res,mat3(SDF_Sphere(p,.2),0,0,
-					1.,0.,1.,
-					0, .5+.5*cos(Time), 0));
+    mat3 res = mat3(
+		max(
+			SDF_Cylinder(p-vec3(1, 0,0),2,1),
+			max(
+					SDF_Box(p-vec3(1,0,1),vec3(1.)),
+					-SDF_Cylinder(p-vec3(1,0,0),2,.5)
+				)
+			)
+		,0,0,
+		0,1.,1.,
+		0,0,0);
+	res = opu(res, mat3(
+		max(
+			SDF_Cylinder(p-vec3(0, 0,-1),2,1),
+			max(
+					SDF_Box(p-vec3(0,0,0),vec3(1.)),
+					-SDF_Cylinder(p-vec3(0,0,-1),2,.5)
+				)
+			)
+		,0,0,
+		0,1.,1.,
+		0,0,0));
 	return res;
 }
 

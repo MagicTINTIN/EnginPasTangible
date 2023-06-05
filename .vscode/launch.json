@@ -15,6 +15,18 @@
             "name": "Demo",
             "request": "launch",
             "type": "node-terminal"
+        },
+        {
+            "command": "${workspaceFolder}/compileEPT.sh ${workspaceFolder}/EnginPasTangible.c",
+            "name": "Compile EPT",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "${workspaceFolder}/ept ${relativeFile}",
+            "name": "EPT your fs",
+            "request": "launch",
+            "type": "node-terminal"
         }
     ]
 }

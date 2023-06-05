@@ -1,0 +1,10 @@
+{"rule":"FR_SIMPLE_REPLACE","sentence":"^\\QCelui-ci permet l'implémentation de OpenGL Shading Language (GLSL), un langage de shading.\\E$"}
+{"rule":"D_N","sentence":"^\\QNotre moteur 3D repose principalement sur les Fragment Shaders.\\E$"}
+{"rule":"J_N","sentence":"^\\QLa contribution de cette source de lumière à l'éclairement d'un objet blanc de normale \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q au point \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q est donnée par ce calcul : \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"PLACE_DE_LA_VIRGULE","sentence":"^\\QIl n'est pas nécessaire de gérer d'éventuel problème de dépassement de couleur car le shader le fait lui-même.\\E$"}
+{"rule":"PLACE_DE_LA_VIRGULE","sentence":"^\\QIl n'est pas nécessaire de gérer d'éventuels problèmes de dépassement de couleur car le shader le fait lui-même.\\E$"}
+{"rule":"J_N","sentence":"^\\QLa distance entre un point \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q et un plan de normale \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q (normalisée) et de hauteur \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q est donnée par \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q Et bien d'autres.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qsur un vecteur équivaut à une symétrie par rapport aux plans xOy, xOz et yOz.\\E$"}
+{"rule":"PRONOMS_PERSONNELS_MINUSCULE","sentence":"^\\Q\\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q Nous allons maintenant voir quelques exemples.\\E$"}
+{"rule":"J_N","sentence":"^\\QIl est également possible de faire des symétries par rapport à un plan de normale \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q et de décalage \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"PLACE_DE_LA_VIRGULE","sentence":"^\\QL'expérience fut très enrichissante car nous avons dû nous organiser pour pouvoir travailler en binôme sur le même code avec l'utilisation d'un gestionnaire de version (git) auquel nous nous sommes formés.\\E$"}
