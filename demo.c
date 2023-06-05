@@ -53,7 +53,7 @@ const char *scenes[] = {
  */
 #define DEBUG_MODE 13
 
-GLuint screenWidth = 1.2 * 720, screenHeight = 1.2 * 480;
+GLuint screenWidth = 1 * 720, screenHeight = 1 * 480;
 const GLFWvidmode *mode;
 GLFWwindow *window;
 
