@@ -264,13 +264,13 @@ mat3 SDF_Global(vec3 p){
 	240,.7,.2,
 	0,0,0));
   // lampadaire rgb
-  res = opu(res, mat3(SDF_Cone(p-vec3(17.,0.,-1.),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),0,0,
+  res = opu(res, mat3(SDF_Cone(repeat(p-vec3(17.,0.,-1.),vec3(1,1,10),vec3(0,0,4)),vec3(0,.0,0.),vec3(0,.8,0.),.7,.2),0,0,
 	0,0,.5,
 	0,.4,0));
-    res = opu(res, mat3(SDF_Cylinder(p-vec3(17.,2.,-1.),2.,.2),0,0,
+    res = opu(res, mat3(SDF_Cylinder(repeat(p-vec3(17.,2.,-1.),vec3(1,1,10),vec3(0,0,4)),2.,.2),0,0,
 	0,0,.5,
 	0,.4,0));
-  res = opu(res, mat3(SDF_Sphere(p-vec3(17.,4.,-1.),.5),0,0,
+  res = opu(res, mat3(SDF_Sphere(repeat(p-vec3(17.,4.,-1.),vec3(1,1,10),vec3(0,0,4)),.5),0,0,
 	mod(100*Time, 360),.5,1.,
 	1.,0,0));
     return res;
@@ -349,7 +349,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
   	if (impact[2].y > .0){
 	
   		mat3 reflexion = Get_Impact(impact[0]+0.02*normale,normalize(symetrique));
-		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*skycolor;
+		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*speclr(reflexion[2].x,skycolor);
 		g*=clamp(speclr(reflexion[2].x,dot(sunPos,grad(reflexion[0]))),0.,1.);
 	
 	}

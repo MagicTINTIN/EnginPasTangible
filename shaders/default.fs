@@ -250,7 +250,7 @@ vec3 Get_Color(vec3 origin,vec3 dir){
   	if (impact[2].y > .0){
 	
   		mat3 reflexion = Get_Impact(impact[0]+0.02*normale,normalize(symetrique));
-		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*skycolor;
+		g=reflexion[1].x<0.?vec3(0.):HSV(reflexion[1])*impact[2].y*speclr(reflexion[2].x,skycolor);
 		g*=clamp(speclr(reflexion[2].x,dot(sunPos,grad(reflexion[0]))),0.,1.);
 	
 	}
