@@ -242,16 +242,19 @@ float pnoise(vec3 P, vec3 rep)
 
 mat3 SDF_Global(vec3 p){
   // immeuble
-  mat3 res = mat3(SDF_Box_Frame(repeat(p-vec3(0,21.0,0), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(1.,1.,1.),.1),0, 0,
+  float nbetage = 8+CustomInt;
+  //mat3 res = mat3(SDF_Box_Frame(rotate(repeat(p-vec3(0,2*nbetage+1.,0), vec3(4.,2.,10.), vec3(2., nbetage, 4.)),vec3(0,cos(.1*p.y+2*floor(.2*p.z+0.5)),0)), vec3(1.,1.,1.),.1),0, 0,
+  mat3 res = mat3(SDF_Box_Frame(rotate(repeat(p-vec3(0,2*nbetage+1.,0), vec3(4.,2.,10.), vec3(2., nbetage, 4.)),vec3(0,.1*p.y+2*floor(.2*p.z+0.5),0)), vec3(1.,1.,1.),.1),0, 0,
 	0, 0, 1.,
 	0,0,0);
-    res = opu(res, mat3(SDF_Box(repeat(p-vec3(0,21.05,0.), vec3(4.,2.,10.), vec3(2., 10., 4.)), vec3(.9)),0,0,
+  //res = opu(res, mat3(SDF_Box(rotate(repeat(p-vec3(0,2*nbetage+1.05,0.), vec3(4.,2.,10.), vec3(2., nbetage, 4.)),vec3(0,cos(.1*p.y+2*floor(.2*p.z+0.5)),0)), vec3(.9)),0,0,
+  res = opu(res, mat3(SDF_Box(rotate(repeat(p-vec3(0,2*nbetage+1.05,0.), vec3(4.,2.,10.), vec3(2., nbetage, 4.)),vec3(0,.1*p.y+2*floor(.2*p.z+0.5),0)), vec3(.9)),0,0,
 	210,.5,1.,
 	.0,.5,0));
   // herbe
   res = opu(res, mat3(SDF_Box(p,vec3(20.,0.1,50.)),0,0, //-vec3(0,.1*cos(p.x+p.y),0)
-	//120,.8,.4+.1*pnoise(p, vec3(21,21,21.)),//+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z), LAGGY
-  120,.8,.4+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z),
+	120,.8,.4+.1*pnoise(p, vec3(21,21,21.)),//+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z), LAGGY
+  //120,.8,.4+.05*sin(10*p.x)*sin(9*p.z)+.03*sin(20*p.x)*sin(22*p.z)+.06*sin(2*p.x)*sin(p.z),
 	0,0,0));
   // route
   res = opu(res, mat3(SDF_Box(p+vec3(0.,0.,5.),vec3(20.,0.1,2.)),0,0,
