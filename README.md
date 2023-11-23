@@ -55,7 +55,7 @@ Incrémenter/Décrémenter : <kbd>B</kbd>/<kbd>N</kbd> (dans evol.fs)<br>
 
 
 Pour pouvoir utiliser le moteur il vous suffit d'installer les librairies glfw.
-> ### Linux
+### Linux
 
 * Pour les distributions Debian :
   
@@ -71,11 +71,21 @@ Puis, dans le repertoire de votre choix
 
 `git clone https://github.com/MagicTINTIN/EnginPasTangible.git`<br>
 `cd EnginPasTangible/`<br>
+
+> ### Compilation avec CMake (recommandé)
+Installez CMake (`sudo apt install cmake` ou `sudo pacman -Sy cmake`).<br>
+Puis, exécutez :
+`./cmakecompile.sh`
+
+> ### Ancienne méthode de compilation
+
 `chmod +x run_linux.sh`
 
-Pour compiler EnginPasTangible, executez `./compileEPT.sh EnginPasTangible.c`
+Pour compiler EnginPasTangible, exécutez `./compileEPT.sh EnginPasTangible.c`
 
-Une fois votre programme compilé, vous pouvez exécuter `./ept chemin/vers/un/fichier.fs`<br>
+> ### Exécution d'EnginPasTangible
+
+Une fois votre programme compilé, vous pouvez exécuter en utilisant `build/ept chemin/vers/un/fichier.fs `(ou `./ept chemin/vers/un/fichier.fs` avec l'ancienne méthode de compilation)<br>
 *(plusieurs fichiers sont disponibles dans shaders/)*<br>
 Vous pouvez importer plusieurs fichiers .fs (max 100), pour changer de scène il vous suffit d'appuyer sur les touches <kbd>F</kbd> ou <kbd>J</kbd>
 

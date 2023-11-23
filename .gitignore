@@ -95,3 +95,6 @@ LaTex/main.synctex
 
 LaTeX/Parties/Annexes.aux
 ept
+
+build/*
+debug/*
